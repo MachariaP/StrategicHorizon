@@ -1,8 +1,49 @@
-# Python
+# ============================================
+# Operating System Files
+# ============================================
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Linux
+*~
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# ============================================
+# Python - Django
+# ============================================
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
+
+# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -16,43 +57,518 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-venv/
-env/
-ENV/
-*.sqlite3
-db.sqlite3
+MANIFEST
 
-# Node
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.python-version
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# pdm
+.pdm.toml
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+!media/.gitkeep
+staticfiles/
+!staticfiles/.gitkeep
+
+# Django Migrations (uncomment if you want to ignore generated migrations)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# PyCharm
+.idea/
+.idea/*
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# ============================================
+# Node.js / React / TypeScript
+# ============================================
+
+# Dependencies
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnp
+.pnp/
 .pnp.js
-coverage/
-build/
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnpm-debug.log*
 
-# IDEs
-.vscode/
+# Testing
+coverage/
+.nyc_output
+
+# Production build
+build/
+dist/
+.next/
+out/
+
+# Serverless
+.serverless/
+.serverless_nextjs/
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Next.js
+.next/
+out/
+
+# Nuxt.js
+.nuxt/
+.nuxt-prod
+
+# Gatsby
+.cache/
+public
+
+# Vue.js
+dist/
+
+# Svelte
+.svelte-kit/
+
+# Storybook
+storybook-static/
+
+# Chrome
+chrome-user-data/
+
+# IDE
 .idea/
+.vscode/
 *.swp
 *.swo
 *~
 
-# Environment variables
-.env
+# ============================================
+# Database
+# ============================================
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# PostgreSQL
+*.dump
+*.backup
+
+# MySQL
+*.frm
+*.myd
+*.myi
+*.ibd
+
+# ============================================
+# Docker
+# ============================================
 
 # Docker
-*.log
+Dockerfile.dev
+Dockerfile.prod
+docker-compose.override.yml
 
-# OS
+# Docker Compose
+docker-compose.yml
+!docker-compose.yml  # Keep the main compose file
+docker-compose.*.yml
+
+# Kubernetes
+k8s/
+kubernetes/
+*.yaml
+*.yml
+
+# ============================================
+# Environment Variables & Secrets
+# ============================================
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging.local
+.env.*.local
+
+# Secret files
+secrets.yaml
+secrets.yml
+credentials.json
+service-account.json
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.cer
+
+# ============================================
+# IDE & Editor Specific
+# ============================================
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse
+.settings/
+.project
+.classpath
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================
+# Logs
+# ============================================
+
+# Log files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports
+*.dmp
+
+# ============================================
+# Temporary Files
+# ============================================
+
+# Temporary files created by editors and OS
+*.tmp
+*.temp
+*~
+*.swp
+*.swo
+
+# ============================================
+# Testing & QA
+# ============================================
+
+# Playwright
+playwright-report/
+test-results/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# Jest
+jest-cache/
+
+# ============================================
+# Project Specific
+# ============================================
+
+# Django media and static files (keep empty directories)
+media/
+!media/.gitkeep
+staticfiles/
+!staticfiles/.gitkeep
+
+# Uploads
+uploads/
+
+# Cache
+.cache/
+
+# Temp
+tmp/
+temp/
+
+# Backup files
+*.bak
+*.backup
+
+# ============================================
+# Documentation
+# ============================================
+
+# MkDocs
+site/
+
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# ============================================
+# Package Managers
+# ============================================
+
+# Yarn 2
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# ============================================
+# SSL Certificates
+# ============================================
+
+ssl/
+certificates/
+*.crt
+*.key
+*.pem
+*.pfx
+
+# ============================================
+# Development Tools
+# ============================================
+
+# ESLint
+.eslintcache
+
+# Prettier
+.prettiercache
+
+# Stylelint
+.stylelintcache
+
+# ============================================
+# Performance & Monitoring
+# ============================================
+
+# Profiling
+*.prof
+*.profraw
+
+# Heap dumps
+*.heapsnapshot
+
+# ============================================
+# Custom Application Files
+# ============================================
+
+# Application specific
+config/local_settings.py
+*.local.yaml
+*.local.yml
+
+# Seed data
+seed_data/
+!seed_data/.gitkeep
+
+# ============================================
+# Archive Files
+# ============================================
+
+# Compressed files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# ============================================
+# Binary Files
+# ============================================
+
+# Executables
+*.exe
+*.out
+*.app
+
+# ============================================
+# OS Generated
+# ============================================
+
+# Mac
 .DS_Store
+
+# Linux
+*~
+
+# Windows
 Thumbs.db
+
+# ============================================
+# Special Files
+# ============================================
+
+# Keep empty directories
+!.gitkeep
+
+# License files (keep)
+!LICENSE
+!LICENSE.txt
+
+# README files (keep)
+!README.md
+!README.rst
+!README.txt
+
+# Contribution guidelines (keep)
+!CONTRIBUTING.md
+
+# Code of conduct (keep)
+!CODE_OF_CONDUCT.md
+
+# Security policy (keep)
+!SECURITY.md
+
+# ============================================
+# Project Structure Specific
+# ============================================
+
+# Frontend build artifacts
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/out/
+
+# Backend artifacts
+backend/staticfiles/
+backend/media/
+
+# Docker development files
+docker-compose.override.yml
+.env.docker
+docker-compose.dev.yml
+
+# ============================================
+# Git Related
+# ============================================
+
+# Git
+.git-rewrite/
+.git/*
+!/.git/hooks/
+!/.git/config
+!/.git/description
+!/.git/HEAD
