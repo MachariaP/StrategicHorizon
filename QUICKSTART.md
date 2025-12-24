@@ -76,6 +76,36 @@ docker-compose exec db psql -U postgres -d strategic_planner
 
 ## Troubleshooting
 
+### Database Connection Error: "could not translate host name 'db'"
+
+This error occurs when running Django locally without Docker. The application tries to connect to the Docker service name "db" instead of "localhost".
+
+**Solution:**
+1. Create a `.env` file in the `backend/` directory:
+   ```bash
+   cd backend
+   cp .env.example .env
+   ```
+
+2. The `.env` file will have `DATABASE_HOST=localhost` by default, which is correct for local development.
+
+3. Ensure PostgreSQL is running locally and the database exists:
+   ```bash
+   # Check if PostgreSQL is running
+   sudo systemctl status postgresql  # Linux
+   brew services list                # macOS
+   
+   # Create database if needed
+   psql -U postgres -h localhost
+   CREATE DATABASE strategic_planner;
+   \q
+   ```
+
+4. Run the Django server:
+   ```bash
+   python manage.py runserver
+   ```
+
 ### Containers Won't Start
 ```bash
 # Stop all containers
