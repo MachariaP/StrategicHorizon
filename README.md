@@ -45,10 +45,19 @@ All models include multi-tenancy support via ForeignKey to the User model.
 
 ### Prerequisites
 
+**For Docker setup (Recommended):**
 - Docker Desktop (includes Docker Compose)
 - Git
 
+**For local development:**
+- Python 3.11+
+- Node.js 18+
+- PostgreSQL 15+
+- Git
+
 ### Installation & Setup
+
+#### Option 1: Using Docker (Recommended)
 
 1. **Clone the repository**
    ```bash
@@ -56,14 +65,7 @@ All models include multi-tenancy support via ForeignKey to the User model.
    cd StrategicHorizon
    ```
 
-2. **Create environment file**
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Edit `.env` file if needed (default values work for development).
-
-3. **Build and start the containers**
+2. **Build and start the containers**
    ```bash
    docker-compose up --build
    ```
@@ -74,20 +76,123 @@ All models include multi-tenancy support via ForeignKey to the User model.
    - Start PostgreSQL database
    - Set up networking between containers
 
-4. **Run database migrations** (in a new terminal)
+3. **Run database migrations** (in a new terminal)
    ```bash
    docker-compose exec backend python manage.py migrate
    ```
 
-5. **Create a superuser** (for admin access)
+4. **Create a superuser** (for admin access)
    ```bash
    docker-compose exec backend python manage.py createsuperuser
+   ```
+
+5. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:8000/api/
+   - Admin Panel: http://localhost:8000/admin/
+
+#### Option 2: Local Development (Without Docker)
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/MachariaP/StrategicHorizon.git
+   cd StrategicHorizon
+   ```
+
+2. **Set up PostgreSQL database**
+   
+   Install PostgreSQL and create a database:
+   ```bash
+   # On Ubuntu/Debian
+   sudo apt-get install postgresql postgresql-contrib
+   
+   # On macOS
+   brew install postgresql
+   
+   # Create database
+   sudo -u postgres psql
+   CREATE DATABASE strategic_planner;
+   CREATE USER postgres WITH PASSWORD 'postgres';
+   GRANT ALL PRIVILEGES ON DATABASE strategic_planner TO postgres;
+   \q
+   ```
+
+3. **Configure environment variables**
+   ```bash
+   cd backend
+   cp .env.example .env
+   ```
+   
+   Edit the `.env` file if needed. The default values are:
+   ```
+   DATABASE_HOST=localhost
+   DATABASE_PORT=5432
+   DATABASE_NAME=strategic_planner
+   DATABASE_USER=postgres
+   DATABASE_PASSWORD=postgres
+   ```
+
+4. **Set up Python backend**
+   ```bash
+   cd backend
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   python manage.py migrate
+   python manage.py createsuperuser
+   python manage.py runserver
+   ```
+
+5. **Set up React frontend** (in a new terminal)
+   ```bash
+   cd frontend
+   npm install
+   npm start
    ```
 
 6. **Access the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000/api/
    - Admin Panel: http://localhost:8000/admin/
+
+## 🔧 Troubleshooting
+
+### Database Connection Issues
+
+**Problem:** `could not translate host name "db" to address`
+
+**Solution:** This occurs when running Django locally without Docker. The application is trying to connect to the Docker service name "db" instead of "localhost".
+
+1. **Create a .env file** in the `backend/` directory:
+   ```bash
+   cd backend
+   cp .env.example .env
+   ```
+
+2. **Verify DATABASE_HOST is set correctly** in your `.env` file:
+   ```
+   DATABASE_HOST=localhost
+   ```
+   
+   Note: Use `DATABASE_HOST=localhost` for local development, and `DATABASE_HOST=db` when running with Docker.
+
+3. **Ensure PostgreSQL is running locally:**
+   ```bash
+   # On Ubuntu/Debian
+   sudo systemctl status postgresql
+   sudo systemctl start postgresql
+   
+   # On macOS
+   brew services list
+   brew services start postgresql
+   ```
+
+4. **Verify database exists:**
+   ```bash
+   psql -U postgres -h localhost
+   \l  # List databases
+   \q  # Quit
+   ```
 
 ## 🔐 Authentication
 
