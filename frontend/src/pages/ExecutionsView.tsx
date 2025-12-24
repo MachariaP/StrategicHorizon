@@ -20,8 +20,19 @@ const ExecutionsView: React.FC = () => {
         const data = await executionApi.getAll();
         setExecutions(data.filter(e => e.year === currentYear));
         setError(null);
-      } catch (err) {
-        setError('Failed to load executions');
+      } catch (err: any) {
+        // Provide more specific error messages based on error type
+        if (err.name === 'NetworkError') {
+          setError(err.message);
+        } else if (err.response?.status === 401) {
+          setError('Authentication failed. Please log in to continue.');
+        } else if (err.response?.status === 403) {
+          setError('Access denied. You do not have permission to view this data.');
+        } else if (err.response?.status >= 500) {
+          setError('Server error. Please try again later or contact support.');
+        } else {
+          setError('Failed to load executions. Please try again or contact support.');
+        }
         console.error('Executions error:', err);
       } finally {
         setLoading(false);
@@ -59,8 +70,35 @@ const ExecutionsView: React.FC = () => {
   if (error) {
     return (
       <div className="p-6">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded shadow-md">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3 flex-1">
+              <p className="font-medium">Connection Error</p>
+              <p className="mt-1 text-sm">{error}</p>
+              <div className="mt-4">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors"
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="mt-6 bg-blue-50 border-l-4 border-blue-400 text-blue-700 px-4 py-3 rounded">
+          <p className="font-medium">Troubleshooting Steps:</p>
+          <ul className="mt-2 text-sm list-disc list-inside space-y-1">
+            <li>Ensure the backend server is running (check Docker container status)</li>
+            <li>Verify the API is accessible at {process.env.REACT_APP_API_URL || 'http://localhost:8000'}</li>
+            <li>Check your network connection</li>
+            <li>Review the browser console for detailed error messages</li>
+          </ul>
         </div>
       </div>
     );
