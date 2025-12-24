@@ -26,11 +26,23 @@ api.interceptors.request.use(
   }
 );
 
-// Handle token refresh on 401 errors
+// Handle token refresh on 401 errors and connection errors
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Handle network/connection errors
+    if (!error.response) {
+      // Network error (e.g., ERR_CONNECTION_REFUSED, no internet)
+      const enhancedError = new Error(
+        `Unable to connect to the server. Please ensure the backend is running on ${
+          process.env.REACT_APP_API_URL || 'http://localhost:8000'
+        } or check your internet connection.`
+      );
+      enhancedError.name = 'NetworkError';
+      return Promise.reject(enhancedError);
+    }
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
