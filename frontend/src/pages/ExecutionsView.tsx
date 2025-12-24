@@ -22,10 +22,10 @@ const ExecutionsView: React.FC = () => {
       setErrorType(null);
       const data = await executionApi.getAll();
       setExecutions(data.filter(e => e.year === currentYear));
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Use utility functions for consistent error handling
-      setError(getErrorMessage(err));
-      setErrorType(err);
+      setError(getErrorMessage(err as AppError));
+      setErrorType(err as AppError);
       console.error('Executions error:', err);
     } finally {
       setLoading(false);

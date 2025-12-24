@@ -10,7 +10,7 @@ export interface AppError {
   message?: string;
   response?: {
     status?: number;
-    data?: any;
+    data?: unknown;
   };
 }
 

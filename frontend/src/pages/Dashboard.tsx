@@ -26,10 +26,10 @@ const Dashboard: React.FC = () => {
       const goalsData = await goalApi.getAll();
       setGoals(goalsData);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Use utility functions for consistent error handling
-      setError(getErrorMessage(err));
-      setErrorType(err);
+      setError(getErrorMessage(err as AppError));
+      setErrorType(err as AppError);
       console.error('Dashboard error:', err);
     } finally {
       setLoading(false);

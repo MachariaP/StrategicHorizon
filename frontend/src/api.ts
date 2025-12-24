@@ -36,9 +36,9 @@ api.interceptors.response.use(
     if (!error.response) {
       // Network error (e.g., ERR_CONNECTION_REFUSED, no internet)
       const enhancedError = new Error(
-        'Unable to connect to the server. Please ensure the backend is running on ' +
-        (process.env.REACT_APP_API_URL || 'http://localhost:8000') +
-        ' or check your internet connection.'
+        `Unable to connect to the server. Please ensure the backend is running on ${
+          process.env.REACT_APP_API_URL || 'http://localhost:8000'
+        } or check your internet connection.`
       );
       enhancedError.name = 'NetworkError';
       return Promise.reject(enhancedError);
