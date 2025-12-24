@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { authApi } from '../api';
 
 const Login: React.FC = () => {
@@ -8,6 +8,10 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get success message from registration redirect
+  const successMessage = (location.state as any)?.message;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +51,12 @@ const Login: React.FC = () => {
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
+              {successMessage}
+            </div>
+          )}
+          
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
               {error}
@@ -95,7 +105,12 @@ const Login: React.FC = () => {
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Don't have an account? Contact your administrator.</p>
+          <p>
+            Don't have an account?{' '}
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
+              Create one here
+            </Link>
+          </p>
         </div>
       </div>
     </div>

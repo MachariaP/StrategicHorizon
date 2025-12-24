@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     VisionViewSet, GoalViewSet, KPIViewSet,
     NonNegotiableViewSet, SystemViewSet, PersonViewSet,
-    ExecutionViewSet, ObstacleViewSet, QuarterlyReflectionViewSet
+    ExecutionViewSet, ObstacleViewSet, QuarterlyReflectionViewSet,
+    register_user
 )
 
 router = DefaultRouter()
@@ -19,4 +20,5 @@ router.register(r'reflections', QuarterlyReflectionViewSet, basename='reflection
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('register/', register_user, name='register'),
 ]

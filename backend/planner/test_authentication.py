@@ -4,6 +4,110 @@ from rest_framework.test import APIClient
 from rest_framework import status
 
 
+class UserRegistrationTest(TestCase):
+    """Test user registration endpoint"""
+
+    def setUp(self):
+        """Set up test client"""
+        self.client = APIClient()
+
+    def test_register_user_success(self):
+        """Test successful user registration"""
+        response = self.client.post('/api/register/', {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'password': 'securepass123',
+            'password_confirm': 'securepass123',
+            'first_name': 'New',
+            'last_name': 'User'
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn('id', response.data)
+        self.assertEqual(response.data['username'], 'newuser')
+        self.assertEqual(response.data['email'], 'newuser@example.com')
+        
+        # Verify user was created in database
+        user = User.objects.get(username='newuser')
+        self.assertEqual(user.email, 'newuser@example.com')
+        self.assertTrue(user.check_password('securepass123'))
+
+    def test_register_user_password_mismatch(self):
+        """Test registration fails when passwords don't match"""
+        response = self.client.post('/api/register/', {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'password': 'securepass123',
+            'password_confirm': 'differentpass123'
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('password', response.data)
+
+    def test_register_user_duplicate_username(self):
+        """Test registration fails with duplicate username"""
+        # Create a user first
+        User.objects.create_user(
+            username='existinguser',
+            email='existing@example.com',
+            password='password123'
+        )
+        
+        # Try to create another user with the same username
+        response = self.client.post('/api/register/', {
+            'username': 'existinguser',
+            'email': 'newemail@example.com',
+            'password': 'securepass123',
+            'password_confirm': 'securepass123'
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('username', response.data)
+
+    def test_register_user_missing_email(self):
+        """Test registration fails when email is missing"""
+        response = self.client.post('/api/register/', {
+            'username': 'newuser',
+            'password': 'securepass123',
+            'password_confirm': 'securepass123'
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('email', response.data)
+
+    def test_register_user_short_password(self):
+        """Test registration fails with password less than 8 characters"""
+        response = self.client.post('/api/register/', {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'password': 'short',
+            'password_confirm': 'short'
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('password', response.data)
+
+    def test_login_after_registration(self):
+        """Test that newly registered user can log in"""
+        # Register a new user
+        self.client.post('/api/register/', {
+            'username': 'newuser',
+            'email': 'newuser@example.com',
+            'password': 'securepass123',
+            'password_confirm': 'securepass123'
+        })
+        
+        # Try to log in with the new credentials
+        response = self.client.post('/api/token/', {
+            'username': 'newuser',
+            'password': 'securepass123'
+        })
+        
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+
+
 class TokenAuthenticationTest(TestCase):
     """Test JWT token authentication endpoints"""
 
