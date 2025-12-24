@@ -109,13 +109,15 @@ All models include multi-tenancy support via ForeignKey to the User model.
    # On macOS
    brew install postgresql
    
-   # Create database
+   # Create database (using default postgres superuser)
    sudo -u postgres psql
    CREATE DATABASE strategic_planner;
-   CREATE USER postgres WITH PASSWORD 'postgres';
+   ALTER USER postgres WITH PASSWORD 'postgres';
    GRANT ALL PRIVILEGES ON DATABASE strategic_planner TO postgres;
    \q
    ```
+   
+   **Note:** For production, create a dedicated database user with a strong password.
 
 3. **Configure environment variables**
    ```bash
