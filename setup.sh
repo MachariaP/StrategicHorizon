@@ -27,6 +27,15 @@ else
     echo "ℹ️  .env file already exists"
 fi
 
+# Create backend/.env file if it doesn't exist (for local development)
+if [ ! -f backend/.env ]; then
+    echo "📝 Creating backend/.env file from template..."
+    cp backend/.env.example backend/.env
+    echo "✅ backend/.env file created"
+else
+    echo "ℹ️  backend/.env file already exists"
+fi
+
 # Build and start containers
 echo "🏗️  Building Docker containers (this may take a few minutes)..."
 docker-compose up --build -d
