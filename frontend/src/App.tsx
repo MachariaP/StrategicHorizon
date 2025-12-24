@@ -17,6 +17,8 @@ const queryClient = new QueryClient({
 });
 
 // Protected Route wrapper component
+// Note: Token validity is checked by API interceptors on each request.
+// Invalid/expired tokens will trigger 401 response and automatic redirect to login.
 const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
   const isAuthenticated = !!localStorage.getItem('accessToken');
   return isAuthenticated ? children : <Navigate to="/login" replace />;

@@ -106,7 +106,7 @@ else:
         }
     }
 
-# Use SQLite in-memory for testing when explicitly set via environment variable
+# Use SQLite in-memory for unit tests when explicitly set via environment variable
 if os.getenv('USE_SQLITE_FOR_TESTS', 'false').lower() == 'true':
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
