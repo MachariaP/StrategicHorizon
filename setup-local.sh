@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit on error, undefined variables, and pipe failures
+set -euo pipefail
+
 # 2026 Strategic Planner Local Development Setup Script
 # This script sets up the application for local development WITHOUT Docker
 
@@ -70,6 +73,8 @@ echo "   CREATE DATABASE strategic_planner;"
 echo "   CREATE USER postgres WITH PASSWORD 'postgres';"
 echo "   GRANT ALL PRIVILEGES ON DATABASE strategic_planner TO postgres;"
 echo "   \\q"
+echo ""
+echo "   ⚠️  SECURITY: For production, use a strong password and update your .env file!"
 echo ""
 echo "3. Run migrations:"
 echo "   python manage.py migrate"
