@@ -97,9 +97,8 @@ DATABASES = {
     }
 }
 
-# Use SQLite for testing when PostgreSQL is not available
-import sys
-if 'test' in sys.argv:
+# Use SQLite for testing when explicitly set via environment variable
+if os.getenv('USE_SQLITE_FOR_TESTS', 'false').lower() == 'true':
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',
