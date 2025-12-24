@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import MainLayout from './components/MainLayout';
 import Dashboard from './pages/Dashboard';
@@ -16,13 +16,19 @@ const queryClient = new QueryClient({
   },
 });
 
+// Protected Route wrapper component
+const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+  const isAuthenticated = !!localStorage.getItem('accessToken');
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route element={<MainLayout />}>
+          <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/executions" element={<ExecutionsView />} />
             {/* Placeholder routes for other modules */}
