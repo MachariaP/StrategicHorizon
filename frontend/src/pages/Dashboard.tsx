@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { visionApi, goalApi } from '../api';
 import type { Vision, Goal } from '../types';
-import { getErrorMessage, getErrorTitle } from '../utils/errorHandling';
+import { getErrorMessage, getErrorTitle, AppError } from '../utils/errorHandling';
 
 const Dashboard: React.FC = () => {
   const [vision, setVision] = useState<Vision | null>(null);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [errorType, setErrorType] = useState<any>(null);
+  const [errorType, setErrorType] = useState<AppError | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { executionApi } from '../api';
 import type { Execution } from '../types';
-import { getErrorMessage, getErrorTitle } from '../utils/errorHandling';
+import { getErrorMessage, getErrorTitle, AppError } from '../utils/errorHandling';
 
 const ExecutionsView: React.FC = () => {
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [errorType, setErrorType] = useState<any>(null);
+  const [errorType, setErrorType] = useState<AppError | null>(null);
   const currentYear = 2026;
 
   const months = [
