@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { visionApi, goalApi } from '../api';
 import type { Vision, Goal } from '../types';
+import { getErrorMessage, getErrorTitle } from '../utils/errorHandling';
 
 const Dashboard: React.FC = () => {
   const [vision, setVision] = useState<Vision | null>(null);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,19 +26,11 @@ const Dashboard: React.FC = () => {
         setGoals(goalsData);
 
         setError(null);
+        setErrorType(null);
       } catch (err: any) {
-        // Provide more specific error messages based on error type
-        if (err.name === 'NetworkError') {
-          setError(err.message);
-        } else if (err.response?.status === 401) {
-          setError('Authentication failed. Please log in to continue.');
-        } else if (err.response?.status === 403) {
-          setError('Access denied. You do not have permission to view this data.');
-        } else if (err.response?.status >= 500) {
-          setError('Server error. Please try again later or contact support.');
-        } else {
-          setError('Failed to load dashboard data. Please try again or contact support.');
-        }
+        // Use utility functions for consistent error handling
+        setError(getErrorMessage(err));
+        setErrorType(err);
         console.error('Dashboard error:', err);
       } finally {
         setLoading(false);
@@ -65,7 +59,7 @@ const Dashboard: React.FC = () => {
               </svg>
             </div>
             <div className="ml-3 flex-1">
-              <p className="font-medium">Connection Error</p>
+              <p className="font-medium">{getErrorTitle(errorType)}</p>
               <p className="mt-1 text-sm">{error}</p>
               <div className="mt-4">
                 <button

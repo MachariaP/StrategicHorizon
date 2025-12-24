@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { executionApi } from '../api';
 import type { Execution } from '../types';
+import { getErrorMessage, getErrorTitle } from '../utils/errorHandling';
 
 const ExecutionsView: React.FC = () => {
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<any>(null);
   const currentYear = 2026;
 
   const months = [
@@ -20,19 +22,11 @@ const ExecutionsView: React.FC = () => {
         const data = await executionApi.getAll();
         setExecutions(data.filter(e => e.year === currentYear));
         setError(null);
+        setErrorType(null);
       } catch (err: any) {
-        // Provide more specific error messages based on error type
-        if (err.name === 'NetworkError') {
-          setError(err.message);
-        } else if (err.response?.status === 401) {
-          setError('Authentication failed. Please log in to continue.');
-        } else if (err.response?.status === 403) {
-          setError('Access denied. You do not have permission to view this data.');
-        } else if (err.response?.status >= 500) {
-          setError('Server error. Please try again later or contact support.');
-        } else {
-          setError('Failed to load executions. Please try again or contact support.');
-        }
+        // Use utility functions for consistent error handling
+        setError(getErrorMessage(err));
+        setErrorType(err);
         console.error('Executions error:', err);
       } finally {
         setLoading(false);
@@ -78,7 +72,7 @@ const ExecutionsView: React.FC = () => {
               </svg>
             </div>
             <div className="ml-3 flex-1">
-              <p className="font-medium">Connection Error</p>
+              <p className="font-medium">{getErrorTitle(errorType)}</p>
               <p className="mt-1 text-sm">{error}</p>
               <div className="mt-4">
                 <button
