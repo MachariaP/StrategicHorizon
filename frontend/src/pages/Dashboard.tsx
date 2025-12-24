@@ -10,33 +10,33 @@ const Dashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [errorType, setErrorType] = useState<AppError | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Fetch vision for 2026
-        const visions = await visionApi.getAll();
-        const vision2026 = visions.find(v => v.year === 2026);
-        if (vision2026) {
-          setVision(vision2026);
-        }
-
-        // Fetch goals
-        const goalsData = await goalApi.getAll();
-        setGoals(goalsData);
-
-        setError(null);
-        setErrorType(null);
-      } catch (err: any) {
-        // Use utility functions for consistent error handling
-        setError(getErrorMessage(err));
-        setErrorType(err);
-        console.error('Dashboard error:', err);
-      } finally {
-        setLoading(false);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setErrorType(null);
+      // Fetch vision for 2026
+      const visions = await visionApi.getAll();
+      const vision2026 = visions.find(v => v.year === 2026);
+      if (vision2026) {
+        setVision(vision2026);
       }
-    };
 
+      // Fetch goals
+      const goalsData = await goalApi.getAll();
+      setGoals(goalsData);
+
+    } catch (err: any) {
+      // Use utility functions for consistent error handling
+      setError(getErrorMessage(err));
+      setErrorType(err);
+      console.error('Dashboard error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
               <p className="mt-1 text-sm">{error}</p>
               <div className="mt-4">
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={() => fetchData()}
                   className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors"
                 >
                   Retry

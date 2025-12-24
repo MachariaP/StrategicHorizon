@@ -15,24 +15,24 @@ const ExecutionsView: React.FC = () => {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  useEffect(() => {
-    const fetchExecutions = async () => {
-      try {
-        setLoading(true);
-        const data = await executionApi.getAll();
-        setExecutions(data.filter(e => e.year === currentYear));
-        setError(null);
-        setErrorType(null);
-      } catch (err: any) {
-        // Use utility functions for consistent error handling
-        setError(getErrorMessage(err));
-        setErrorType(err);
-        console.error('Executions error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchExecutions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setErrorType(null);
+      const data = await executionApi.getAll();
+      setExecutions(data.filter(e => e.year === currentYear));
+    } catch (err: any) {
+      // Use utility functions for consistent error handling
+      setError(getErrorMessage(err));
+      setErrorType(err);
+      console.error('Executions error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchExecutions();
   }, []);
 
@@ -76,7 +76,7 @@ const ExecutionsView: React.FC = () => {
               <p className="mt-1 text-sm">{error}</p>
               <div className="mt-4">
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={() => fetchExecutions()}
                   className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors"
                 >
                   Retry
