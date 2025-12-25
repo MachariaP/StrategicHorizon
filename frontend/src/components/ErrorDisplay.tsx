@@ -10,6 +10,13 @@ interface ErrorDisplayProps {
 
 /**
  * Reusable error display component with contextual troubleshooting steps
+ * 
+ * Displays user-friendly error messages with specific troubleshooting guidance
+ * based on error type (network, authentication, permission, server errors, etc.)
+ * 
+ * Note: Troubleshooting steps assume Docker-based deployment as recommended
+ * in the project README. For non-Docker deployments, users should adapt
+ * the Docker commands to their specific setup.
  */
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, apiUrl, retryAriaLabel }) => {
   if (!error) return null;
