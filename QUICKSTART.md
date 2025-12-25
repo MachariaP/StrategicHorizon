@@ -1,13 +1,15 @@
 # Quick Start Guide - 2026 Strategic Planner
 
-Get up and running with the 2026 Strategic Planner in 5 minutes!
+Get up and running with the 2026 Strategic Planner in a few simple steps!
 
 ## Prerequisites
 
-- Docker Desktop installed ([Download here](https://www.docker.com/products/docker-desktop))
+- Python 3.11+ installed
+- Node.js 18+ installed
+- PostgreSQL 15+ installed
 - Git installed
 
-## Installation (5 Steps)
+## Installation
 
 ### Step 1: Clone the Repository
 ```bash
@@ -15,32 +17,77 @@ git clone https://github.com/MachariaP/StrategicHorizon.git
 cd StrategicHorizon
 ```
 
-### Step 2: Run the Setup Script
+### Step 2: Set up PostgreSQL Database
+
+Install PostgreSQL and create a database:
 ```bash
-./setup.sh
+# On Ubuntu/Debian
+sudo apt-get install postgresql postgresql-contrib
+
+# On macOS
+brew install postgresql
+
+# Start PostgreSQL service
+sudo systemctl start postgresql  # Ubuntu/Debian
+brew services start postgresql   # macOS
+
+# Create database (using default postgres superuser)
+sudo -u postgres psql
+CREATE DATABASE strategic_planner;
+ALTER USER postgres WITH PASSWORD 'postgres';
+GRANT ALL PRIVILEGES ON DATABASE strategic_planner TO postgres;
+\q
 ```
 
-This will:
-- Create environment configuration
-- Build Docker containers
-- Start all services
-- Run database migrations
+**Note:** For production, create a dedicated database user with a strong password.
 
-### Step 3: Create an Admin User
+### Step 3: Set up the Backend
+
 ```bash
-docker-compose exec backend python manage.py createsuperuser
+cd backend
+
+# Create environment file
+cp .env.example .env
+
+# Create and activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run migrations
+python manage.py migrate
+
+# Create a superuser for admin access
+python manage.py createsuperuser
+
+# Start the development server
+python manage.py runserver
 ```
 
-Follow the prompts to create your admin account.
+### Step 4: Set up the Frontend
 
-### Step 4: Access the Application
+Open a new terminal:
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm start
+```
+
+### Step 5: Access the Application
 
 Open your browser and visit:
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000/api/
 - **Admin Panel**: http://localhost:8000/admin/
 
-### Step 5: Create Your First Vision
+### Step 6: Create Your First Vision
 
 1. Log in to the admin panel (http://localhost:8000/admin/)
 2. Add a new Vision for year 2026
@@ -49,36 +96,60 @@ Open your browser and visit:
 
 ## Common Commands
 
-### View Application Logs
+### Backend Commands
+
 ```bash
-docker-compose logs -f
+# Activate virtual environment
+cd backend
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Run migrations
+python manage.py migrate
+
+# Create a superuser
+python manage.py createsuperuser
+
+# Start development server
+python manage.py runserver
+
+# Access Django shell
+python manage.py shell
 ```
 
-### Stop the Application
+### Frontend Commands
+
 ```bash
-docker-compose down
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
+
+# Run tests
+npm test
+
+# Build for production
+npm run build
 ```
 
-### Restart the Application
-```bash
-docker-compose up
-```
+### Database Commands
 
-### Access Backend Shell
 ```bash
-docker-compose exec backend python manage.py shell
-```
+# Access database shell
+psql -U postgres -d strategic_planner
 
-### Access Database Shell
-```bash
-docker-compose exec db psql -U postgres -d strategic_planner
+# Check if PostgreSQL is running
+sudo systemctl status postgresql  # Linux
+brew services list                # macOS
 ```
 
 ## Troubleshooting
 
-### Database Connection Error: "could not translate host name 'db'"
+### Database Connection Error
 
-This error occurs when running Django locally without Docker. The application tries to connect to the Docker service name "db" instead of "localhost".
+**Problem:** "could not translate host name to address" or connection errors
 
 **Solution:**
 1. Create a `.env` file in the `backend/` directory:
@@ -101,30 +172,23 @@ This error occurs when running Django locally without Docker. The application tr
    \q
    ```
 
-4. Run the Django server:
+4. Restart the Django server:
    ```bash
    python manage.py runserver
    ```
 
-### Containers Won't Start
-```bash
-# Stop all containers
-docker-compose down
-
-# Remove volumes (⚠️ This deletes your data!)
-docker-compose down -v
-
-# Rebuild from scratch
-docker-compose up --build
-```
-
 ### Port Already in Use
-If ports 3000, 8000, or 5432 are already in use, edit `docker-compose.yml` to change the port mappings.
+
+If ports 3000 or 8000 are already in use:
+- **Backend (port 8000)**: Stop any other Django/Python servers, or specify a different port: `python manage.py runserver 8001`
+- **Frontend (port 3000)**: Stop any other React/Node servers, or the development server will prompt you to use a different port
 
 ### Frontend Shows "Failed to Load"
-1. Ensure backend is running: `docker-compose ps`
-2. Check backend logs: `docker-compose logs backend`
+
+1. Ensure backend is running: Check terminal where you started `python manage.py runserver`
+2. Check backend is accessible: Visit http://localhost:8000/api/
 3. Verify you're logged in to the admin panel first
+4. Check browser console (F12) for error messages
 
 ## Next Steps
 
@@ -137,7 +201,7 @@ If ports 3000, 8000, or 5432 are already in use, edit `docker-compose.yml` to ch
 
 - **Documentation**: See README.md and ARCHITECTURE.md
 - **Issues**: Create an issue on GitHub
-- **Logs**: Check `docker-compose logs` for error messages
+- **Logs**: Check your terminal output for error messages
 
 ## Quick API Examples
 
@@ -169,9 +233,9 @@ curl -X POST http://localhost:8000/api/goals/ \
 
 ## Development Tips
 
-- Backend code changes auto-reload (Django dev server)
-- Frontend code changes auto-reload (Hot Module Replacement)
-- Database data persists across container restarts
+- Backend code changes auto-reload with Django dev server
+- Frontend code changes auto-reload with Hot Module Replacement
+- Database data persists in PostgreSQL
 - Use `.gitignore` to avoid committing sensitive files
 
 ---

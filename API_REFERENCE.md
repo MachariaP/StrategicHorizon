@@ -567,7 +567,6 @@ GET /api/goals/?page=2
 
 The API allows requests from:
 - `http://localhost:3000` (development)
-- `http://frontend:3000` (Docker network)
 
 Update `CORS_ALLOWED_ORIGINS` in settings for production domains.
 
@@ -625,7 +624,7 @@ goals = response.json()
 For API issues or questions:
 1. Check the [README.md](README.md) for setup help
 2. Review [ARCHITECTURE.md](ARCHITECTURE.md) for technical details
-3. Check Django logs: `docker-compose logs backend`
+3. Check Django logs in your terminal or console
 4. Open an issue on GitHub
 
 ---

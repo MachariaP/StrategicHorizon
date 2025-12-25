@@ -1,6 +1,6 @@
 # 2026 Strategic Planner
 
-A comprehensive full-stack productivity application designed to help users move from high-level vision to monthly execution. Built with Django Rest Framework (backend), React with TypeScript (frontend), and containerized with Docker.
+A comprehensive full-stack productivity application designed to help users move from high-level vision to monthly execution. Built with Django Rest Framework (backend) and React with TypeScript (frontend).
 
 ## 🏗️ Architecture Overview
 
@@ -21,7 +21,6 @@ A comprehensive full-stack productivity application designed to help users move 
 - Axios for API communication
 
 **Infrastructure:**
-- Docker & Docker Compose
 - PostgreSQL 15
 - Gunicorn (production WSGI server)
 
@@ -45,53 +44,12 @@ All models include multi-tenancy support via ForeignKey to the User model.
 
 ### Prerequisites
 
-**For Docker setup (Recommended):**
-- Docker Desktop (includes Docker Compose)
-- Git
-
-**For local development:**
 - Python 3.11+
 - Node.js 18+
 - PostgreSQL 15+
 - Git
 
 ### Installation & Setup
-
-#### Option 1: Using Docker (Recommended)
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/MachariaP/StrategicHorizon.git
-   cd StrategicHorizon
-   ```
-
-2. **Build and start the containers**
-   ```bash
-   docker-compose up --build
-   ```
-   
-   This will:
-   - Build the backend (Django) container
-   - Build the frontend (React) container
-   - Start PostgreSQL database
-   - Set up networking between containers
-
-3. **Run database migrations** (in a new terminal)
-   ```bash
-   docker-compose exec backend python manage.py migrate
-   ```
-
-4. **Create a superuser** (for admin access)
-   ```bash
-   docker-compose exec backend python manage.py createsuperuser
-   ```
-
-5. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000/api/
-   - Admin Panel: http://localhost:8000/admin/
-
-#### Option 2: Local Development (Without Docker)
 
 1. **Clone the repository**
    ```bash
@@ -161,9 +119,9 @@ All models include multi-tenancy support via ForeignKey to the User model.
 
 ### Database Connection Issues
 
-**Problem:** `could not translate host name "db" to address`
+**Problem:** `could not translate host name to address` or connection errors
 
-**Solution:** This occurs when running Django locally without Docker. The application is trying to connect to the Docker service name "db" instead of "localhost".
+**Solution:** 
 
 1. **Create a .env file** in the `backend/` directory:
    ```bash
@@ -175,8 +133,6 @@ All models include multi-tenancy support via ForeignKey to the User model.
    ```
    DATABASE_HOST=localhost
    ```
-   
-   Note: Use `DATABASE_HOST=localhost` for local development, and `DATABASE_HOST=db` when running with Docker.
 
 3. **Ensure PostgreSQL is running locally:**
    ```bash
@@ -275,46 +231,42 @@ backend/
 ### Backend (Django)
 
 ```bash
+# Activate virtual environment
+cd backend
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
 # Run migrations
-docker-compose exec backend python manage.py migrate
+python manage.py migrate
 
 # Create migrations after model changes
-docker-compose exec backend python manage.py makemigrations
+python manage.py makemigrations
 
 # Access Django shell
-docker-compose exec backend python manage.py shell
+python manage.py shell
 
 # Run tests
-docker-compose exec backend python manage.py test
+python manage.py test
+
+# Start development server
+python manage.py runserver
 ```
 
 ### Frontend (React)
 
 ```bash
+cd frontend
+
 # Install new packages
-docker-compose exec frontend npm install <package-name>
+npm install <package-name>
 
 # Run linting
-docker-compose exec frontend npm run lint
+npm run lint
 
 # Build for production
-docker-compose exec frontend npm run build
-```
+npm run build
 
-### Docker
-
-```bash
-# Stop all containers
-docker-compose down
-
-# Stop and remove volumes (clears database)
-docker-compose down -v
-
-# View logs
-docker-compose logs -f [service-name]
-
-# Rebuild specific service
-docker-compose up --build [service-name]
+# Start development server
+npm start
 ```
 
 ## 📝 Code Quality Standards
@@ -358,7 +310,6 @@ For production deployment:
 - [React Documentation](https://react.dev/)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [Tailwind CSS](https://tailwindcss.com/docs)
-- [Docker Documentation](https://docs.docker.com/)
 
 ## 🤝 Contributing
 
