@@ -13,10 +13,6 @@ interface ErrorDisplayProps {
  * 
  * Displays user-friendly error messages with specific troubleshooting guidance
  * based on error type (network, authentication, permission, server errors, etc.)
- * 
- * Note: Troubleshooting steps assume Docker-based deployment as recommended
- * in the project README. For non-Docker deployments, users should adapt
- * the Docker commands to their specific setup.
  */
 const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, apiUrl, retryAriaLabel }) => {
   if (!error) return null;
@@ -29,10 +25,10 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, apiUrl, ret
   const getTroubleshootingSteps = (): string[] => {
     if (error.name === 'NetworkError' || !error.response) {
       return [
-        'Ensure the backend server is running (check Docker container status with `docker-compose ps`)',
+        'Ensure the backend server is running (check with `python manage.py runserver`)',
         `Verify the API is accessible at ${effectiveApiUrl}`,
         'Check your network connection',
-        'If running locally, ensure the backend is started with `docker-compose up`',
+        'If running locally, ensure PostgreSQL is running and the backend server is started',
       ];
     } else if (error.response?.status === 401) {
       return [
@@ -51,7 +47,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, apiUrl, ret
       return [
         'The server encountered an error',
         'Try again in a few moments',
-        'Check the backend logs with `docker-compose logs backend`',
+        'Check the backend logs in your terminal or console',
         'Contact support if the issue persists',
       ];
     } else if (error.response?.status === 404) {

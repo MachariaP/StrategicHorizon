@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # 2026 Strategic Planner Local Development Setup Script
-# This script sets up the application for local development WITHOUT Docker
+# This script sets up the application for local development
 
 echo "🚀 Starting 2026 Strategic Planner Local Setup..."
 echo ""
@@ -74,7 +74,7 @@ echo "   ALTER USER postgres WITH PASSWORD 'postgres';"
 echo "   GRANT ALL PRIVILEGES ON DATABASE strategic_planner TO postgres;"
 echo "   \\q"
 echo ""
-echo "   Note: We use the default 'postgres' user for consistency with Docker setup."
+echo "   Note: We use the default 'postgres' user for simplicity."
 echo "   ⚠️  SECURITY: For production, create a dedicated user and use strong passwords!"
 echo ""
 echo "3. Run migrations:"

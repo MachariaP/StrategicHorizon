@@ -6,36 +6,9 @@ This document summarizes all deliverables as specified in the original requireme
 
 ---
 
-## Part A: The Docker Suite ✅
+## Application Setup ✅
 
-### 1. Backend Dockerfile
-**Location**: `backend/Dockerfile`
-- ✅ Python 3.11 base image
-- ✅ PostgreSQL client installation
-- ✅ Dependencies installation from requirements.txt
-- ✅ Working directory setup
-- ✅ Port 8000 exposed
-
-### 2. Frontend Dockerfile
-**Location**: `frontend/Dockerfile`
-- ✅ Node.js 18 base image
-- ✅ npm dependencies installation
-- ✅ Working directory setup
-- ✅ Port 3000 exposed
-
-### 3. docker-compose.yml
-**Location**: `docker-compose.yml`
-- ✅ Three services orchestrated:
-  - Database (PostgreSQL 15)
-  - Backend (Django)
-  - Frontend (React)
-- ✅ Network configuration (bridge network)
-- ✅ Volume configuration (PostgreSQL persistence)
-- ✅ Environment variables properly configured
-- ✅ Service dependencies defined
-- ✅ Health checks implemented
-
-### 4. Environment Configuration
+### Environment Configuration
 **Location**: `.env.example`
 - ✅ Database credentials template
 - ✅ Django secret key placeholder
@@ -43,9 +16,16 @@ This document summarizes all deliverables as specified in the original requireme
 - ✅ API URL configuration
 - ✅ Debug settings
 
+### Setup Scripts
+**Location**: `setup-local.sh`
+- ✅ Local development setup script
+- ✅ PostgreSQL configuration guide
+- ✅ Python virtual environment setup
+- ✅ Dependency installation instructions
+
 ---
 
-## Part B: Backend Architecture ✅
+## Part A: Backend Architecture ✅
 
 ### 1. models.py
 **Location**: `backend/planner/models.py`
@@ -170,7 +150,7 @@ All 9 required models implemented with full specifications:
 
 ---
 
-## Part C: Frontend Architecture ✅
+## Part B: Frontend Architecture ✅
 
 ### 1. types.ts
 **Location**: `frontend/src/types.ts`
@@ -318,7 +298,6 @@ StrategicHorizon/
 │   │   ├── urls.py                   # ✅ Router config
 │   │   ├── admin.py                  # ✅ Admin registration
 │   │   └── migrations/               # ✅ Initial migration
-│   ├── Dockerfile                    # ✅ Backend container
 │   └── requirements.txt              # ✅ Dependencies
 │
 ├── frontend/                         # React Frontend
@@ -331,15 +310,13 @@ StrategicHorizon/
 │   │   ├── types.ts                  # ✅ TypeScript interfaces
 │   │   ├── api.ts                    # ✅ API client
 │   │   └── App.tsx                   # ✅ Main app
-│   ├── Dockerfile                    # ✅ Frontend container
 │   ├── package.json                  # ✅ Dependencies
 │   ├── tailwind.config.js            # ✅ Tailwind setup
 │   └── tsconfig.json                 # ✅ TypeScript config
 │
-├── docker-compose.yml                # ✅ Orchestration
 ├── .env.example                      # ✅ Config template
 ├── .gitignore                        # ✅ Exclusions
-├── setup.sh                          # ✅ Setup script
+├── setup-local.sh                    # ✅ Setup script
 ├── README.md                         # ✅ Main docs
 ├── ARCHITECTURE.md                   # ✅ Technical docs
 └── QUICKSTART.md                     # ✅ Quick start
@@ -349,22 +326,44 @@ StrategicHorizon/
 
 ## Testing Instructions
 
-### 1. Start the Application
+### 1. Set up PostgreSQL Database
 ```bash
-./setup.sh
+# Install and start PostgreSQL
+sudo apt-get install postgresql postgresql-contrib  # Ubuntu/Debian
+brew install postgresql                             # macOS
+
+# Create database
+sudo -u postgres psql
+CREATE DATABASE strategic_planner;
+ALTER USER postgres WITH PASSWORD 'postgres';
+\q
 ```
 
-### 2. Create Admin User
+### 2. Set up Backend
 ```bash
-docker-compose exec backend python manage.py createsuperuser
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
 ```
 
-### 3. Add Sample Data
+### 3. Set up Frontend (in new terminal)
+```bash
+cd frontend
+npm install
+npm start
+```
+
+### 4. Add Sample Data
 1. Visit http://localhost:8000/admin/
 2. Add a Vision for 2026
 3. Add Goals, KPIs, Executions
 
-### 4. View Frontend
+### 5. View Frontend
 1. Visit http://localhost:3000
 2. See Dashboard with Vision and Goals
 3. Navigate to Executions for 12-month view
@@ -390,7 +389,7 @@ All requirements from the problem statement have been successfully implemented:
 ✅ **Complete Full-Stack Application**
 - Django REST Framework backend with 9 models
 - React TypeScript frontend with strict typing
-- Docker containerization with 3 services
+- PostgreSQL database
 
 ✅ **All Core Modules Implemented**
 - Vision & Theme
@@ -412,12 +411,11 @@ All requirements from the problem statement have been successfully implemented:
 - Scalable design
 
 ✅ **Production Ready**
-- Docker containerization
 - Environment-based configuration
 - Database migrations
 - Authentication system
 - API documentation
-- Setup automation
+- Setup automation scripts
 
 The application is ready for development and can be deployed to production with minimal configuration changes.
 

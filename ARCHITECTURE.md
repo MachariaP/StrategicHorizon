@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document provides a comprehensive architectural overview of the 2026 Strategic Planner, a full-stack productivity application built with Django REST Framework, React with TypeScript, and Docker containerization.
+This document provides a comprehensive architectural overview of the 2026 Strategic Planner, a full-stack productivity application built with Django REST Framework and React with TypeScript.
 
 ## System Architecture
 
@@ -17,13 +17,13 @@ This document provides a comprehensive architectural overview of the 2026 Strate
                          HTTP/REST API
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   Docker Compose Network                     │
-│  ┌────────────────┐  ┌────────────────┐  ┌──────────────┐ │
-│  │   Frontend     │  │    Backend     │  │  PostgreSQL  │ │
-│  │   Container    │◄─┤   Container    │◄─┤   Container  │ │
-│  │  (Node:18)     │  │  (Python 3.11) │  │ (Postgres15) │ │
-│  │  Port: 3000    │  │  Port: 8000    │  │  Port: 5432  │ │
-│  └────────────────┘  └────────────────┘  └──────────────┘ │
+│                     Application Stack                        │
+│  ┌────────────────┐  ┌────────────────┐  ┌──────────────┐  │
+│  │   Frontend     │  │    Backend     │  │  PostgreSQL  │  │
+│  │    (React)     │◄─┤    (Django)    │◄─┤   Database   │  │
+│  │  (Node:18)     │  │  (Python 3.11) │  │ (Postgres15) │  │
+│  │  Port: 3000    │  │  Port: 8000    │  │  Port: 5432  │  │
+│  └────────────────┘  └────────────────┘  └──────────────┘  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -48,8 +48,6 @@ This document provides a comprehensive architectural overview of the 2026 Strate
 - **Routing**: React Router DOM 6.x
 
 #### Infrastructure
-- **Containerization**: Docker
-- **Orchestration**: Docker Compose
 - **Database**: PostgreSQL 15
 - **Development Server (Backend)**: Django Dev Server
 - **Development Server (Frontend)**: Create React App Dev Server
@@ -299,24 +297,17 @@ All API responses are typed with TypeScript interfaces defined in `types.ts`:
 - ✅ Password hashing (Django default)
 - ✅ Admin panel access control
 
-## Docker Architecture
+## Application Communication
 
-### Container Communication
+### Service Communication
 
 ```
-Frontend Container (port 3000)
+Frontend (port 3000)
   │
-  └─► Backend Container (port 8000)
+  └─► Backend API (port 8000)
         │
-        └─► Database Container (port 5432)
+        └─► PostgreSQL Database (port 5432)
 ```
-
-### Volumes
-
-- `postgres_data`: Persistent PostgreSQL data
-- `./backend:/app`: Backend code (hot reload)
-- `./frontend:/app`: Frontend code (hot reload)
-- `/app/node_modules`: Node modules (performance)
 
 ### Environment Variables
 
@@ -334,7 +325,7 @@ All sensitive configuration managed via `.env` file:
 1. **Horizontal Scaling**
    - Stateless API design
    - Token-based authentication
-   - Containerized services
+   - Independent services
 
 2. **Database Optimization**
    - Indexed foreign keys
@@ -348,7 +339,7 @@ All sensitive configuration managed via `.env` file:
 
 ### Future Enhancements
 
-- Load balancing (multiple backend containers)
+- Load balancing (multiple backend instances)
 - Redis caching layer
 - CDN for static assets
 - Database read replicas
@@ -359,9 +350,11 @@ All sensitive configuration managed via `.env` file:
 
 ### Local Development
 
-1. Start: `docker-compose up`
-2. Code changes auto-reload
-3. Database persists across restarts
+1. Start PostgreSQL service
+2. Start backend: `python manage.py runserver`
+3. Start frontend: `npm start`
+4. Code changes auto-reload
+5. Database persists locally
 
 ### Making Changes
 

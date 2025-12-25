@@ -20,7 +20,7 @@ describe('ErrorDisplay Component', () => {
     expect(screen.getByText('Connection Error')).toBeInTheDocument();
     expect(screen.getByText(/Unable to connect to server/i)).toBeInTheDocument();
     expect(screen.getByText(/Ensure the backend server is running/i)).toBeInTheDocument();
-    expect(screen.getByText(/docker-compose ps/i)).toBeInTheDocument();
+    expect(screen.getByText(/python manage.py runserver/i)).toBeInTheDocument();
   });
 
   test('renders 401 error with authentication troubleshooting steps', () => {
