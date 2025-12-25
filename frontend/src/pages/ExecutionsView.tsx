@@ -59,7 +59,7 @@ const ExecutionsView: React.FC = () => {
   }
 
   if (error) {
-    return <ErrorDisplay error={error} onRetry={fetchExecutions} />;
+    return <ErrorDisplay error={error} onRetry={fetchExecutions} retryAriaLabel="Retry loading executions data" />;
   }
 
   return (

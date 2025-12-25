@@ -5,12 +5,13 @@ interface ErrorDisplayProps {
   error: AppError | null;
   onRetry?: () => void;
   apiUrl?: string;
+  retryAriaLabel?: string;
 }
 
 /**
  * Reusable error display component with contextual troubleshooting steps
  */
-const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, apiUrl }) => {
+const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, apiUrl, retryAriaLabel }) => {
   if (!error) return null;
 
   const errorTitle = getErrorTitle(error);
@@ -84,7 +85,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ error, onRetry, apiUrl }) =
                 <button
                   onClick={onRetry}
                   className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors"
-                  aria-label="Retry loading data"
+                  aria-label={retryAriaLabel || 'Retry loading data'}
                 >
                   Retry
                 </button>

@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
   }
 
   if (error) {
-    return <ErrorDisplay error={error} onRetry={fetchData} />;
+    return <ErrorDisplay error={error} onRetry={fetchData} retryAriaLabel="Retry loading dashboard data" />;
   }
 
   const pendingGoals = goals.filter(g => g.status === 'pending');
