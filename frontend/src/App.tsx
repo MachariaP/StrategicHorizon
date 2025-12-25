@@ -5,6 +5,7 @@ import MainLayout from './components/MainLayout';
 import Dashboard from './pages/Dashboard';
 import ExecutionsView from './pages/ExecutionsView';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -30,6 +31,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/executions" element={<ExecutionsView />} />

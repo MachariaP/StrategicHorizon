@@ -1,5 +1,5 @@
-from rest_framework import viewsets, permissions
-from rest_framework.decorators import action
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from .models import (
     Vision, Goal, KPI, NonNegotiable, System, Person,
@@ -8,7 +8,8 @@ from .models import (
 from .serializers import (
     VisionSerializer, GoalSerializer, KPISerializer,
     NonNegotiableSerializer, SystemSerializer, PersonSerializer,
-    ExecutionSerializer, ObstacleSerializer, QuarterlyReflectionSerializer
+    ExecutionSerializer, ObstacleSerializer, QuarterlyReflectionSerializer,
+    UserRegistrationSerializer
 )
 
 
@@ -186,4 +187,26 @@ class QuarterlyReflectionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Set the user to the authenticated user"""
         serializer.save(user=self.request.user)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def register_user(request):
+    """
+    Register a new user.
+    This endpoint is public and does not require authentication.
+    """
+    serializer = UserRegistrationSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response(
+            {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'message': 'User created successfully'
+            },
+            status=status.HTTP_201_CREATED
+        )
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

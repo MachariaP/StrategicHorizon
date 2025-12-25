@@ -1,7 +1,8 @@
 import axios from 'axios';
 import type {
   Vision, Goal, KPI, NonNegotiable, System, Person,
-  Execution, Obstacle, QuarterlyReflection, AuthTokens
+  Execution, Obstacle, QuarterlyReflection, AuthTokens,
+  UserRegistration, UserRegistrationResponse
 } from './types';
 
 // Create axios instance with base configuration
@@ -78,6 +79,13 @@ export const authApi = {
     const response = await axios.post(
       `${process.env.REACT_APP_API_URL}/api/token/`,
       { username, password }
+    );
+    return response.data;
+  },
+  register: async (data: UserRegistration): Promise<UserRegistrationResponse> => {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API_URL}/api/register/`,
+      data
     );
     return response.data;
   },

@@ -123,3 +123,19 @@ export interface AuthTokens {
   access: string;
   refresh: string;
 }
+
+export interface UserRegistration {
+  username: string;
+  email: string;
+  password: string;
+  password_confirm: string;
+  first_name?: string;
+  last_name?: string;
+}
+
+export interface UserRegistrationResponse {
+  id: number;
+  username: string;
+  email: string;
+  message: string;
+}
