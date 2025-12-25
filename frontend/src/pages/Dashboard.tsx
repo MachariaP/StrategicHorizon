@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { visionApi, goalApi } from '../api';
 import type { Vision, Goal } from '../types';
-import { getErrorMessage, getErrorTitle, AppError } from '../utils/errorHandling';
+import type { AppError } from '../utils/errorHandling';
+import ErrorDisplay from '../components/ErrorDisplay';
 
 const Dashboard: React.FC = () => {
   const [vision, setVision] = useState<Vision | null>(null);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [errorType, setErrorType] = useState<AppError | null>(null);
+  const [error, setError] = useState<AppError | null>(null);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      setErrorType(null);
       // Fetch vision for 2026
       const visions = await visionApi.getAll();
       const vision2026 = visions.find(v => v.year === 2026);
@@ -27,9 +26,7 @@ const Dashboard: React.FC = () => {
       setGoals(goalsData);
 
     } catch (err: unknown) {
-      // Use utility functions for consistent error handling
-      setError(getErrorMessage(err as AppError));
-      setErrorType(err as AppError);
+      setError(err as AppError);
       console.error('Dashboard error:', err);
     } finally {
       setLoading(false);
@@ -49,40 +46,7 @@ const Dashboard: React.FC = () => {
   }
 
   if (error) {
-    return (
-      <div className="p-6">
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded shadow-md">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3 flex-1">
-              <p className="font-medium">{getErrorTitle(errorType)}</p>
-              <p className="mt-1 text-sm">{error}</p>
-              <div className="mt-4">
-                <button
-                  onClick={() => fetchData()}
-                  className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors"
-                >
-                  Retry
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 bg-blue-50 border-l-4 border-blue-400 text-blue-700 px-4 py-3 rounded">
-          <p className="font-medium">Troubleshooting Steps:</p>
-          <ul className="mt-2 text-sm list-disc list-inside space-y-1">
-            <li>Ensure the backend server is running (check Docker container status)</li>
-            <li>Verify the API is accessible at {process.env.REACT_APP_API_URL || 'http://localhost:8000'}</li>
-            <li>Check your network connection</li>
-            <li>Review the browser console for detailed error messages</li>
-          </ul>
-        </div>
-      </div>
-    );
+    return <ErrorDisplay error={error} onRetry={fetchData} retryAriaLabel="Retry loading dashboard data" />;
   }
 
   const pendingGoals = goals.filter(g => g.status === 'pending');
