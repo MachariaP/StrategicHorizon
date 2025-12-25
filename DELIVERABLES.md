@@ -310,15 +310,13 @@ StrategicHorizon/
 │   │   ├── types.ts                  # ✅ TypeScript interfaces
 │   │   ├── api.ts                    # ✅ API client
 │   │   └── App.tsx                   # ✅ Main app
-│   ├── Dockerfile                    # ✅ Frontend container
 │   ├── package.json                  # ✅ Dependencies
 │   ├── tailwind.config.js            # ✅ Tailwind setup
 │   └── tsconfig.json                 # ✅ TypeScript config
 │
-├── docker-compose.yml                # ✅ Orchestration
 ├── .env.example                      # ✅ Config template
 ├── .gitignore                        # ✅ Exclusions
-├── setup.sh                          # ✅ Setup script
+├── setup-local.sh                    # ✅ Setup script
 ├── README.md                         # ✅ Main docs
 ├── ARCHITECTURE.md                   # ✅ Technical docs
 └── QUICKSTART.md                     # ✅ Quick start
