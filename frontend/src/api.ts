@@ -51,8 +51,9 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refreshToken');
         if (refreshToken) {
+          const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
           const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/api/token/refresh/`,
+            `${baseURL}/api/token/refresh/`,
             { refresh: refreshToken }
           );
           const { access } = response.data;
@@ -76,15 +77,15 @@ api.interceptors.response.use(
 // Authentication API
 export const authApi = {
   login: async (username: string, password: string): Promise<AuthTokens> => {
-    const response = await axios.post(
-      `${process.env.REACT_APP_API_URL}/api/token/`,
+    const response = await api.post(
+      '/api/token/',
       { username, password }
     );
     return response.data;
   },
   register: async (data: UserRegistration): Promise<UserRegistrationResponse> => {
-    const response = await axios.post(
-      `${process.env.REACT_APP_API_URL}/api/register/`,
+    const response = await api.post(
+      '/api/register/',
       data
     );
     return response.data;
