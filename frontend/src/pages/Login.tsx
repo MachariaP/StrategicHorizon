@@ -20,7 +20,7 @@ const Login: React.FC = () => {
       const response = await authAPI.login(formData);
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
-      navigate('/');
+      navigate('/app');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
     } finally {

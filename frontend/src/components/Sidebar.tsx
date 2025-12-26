@@ -5,16 +5,16 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
 
   const menuItems = [
-    { name: 'Dashboard', path: '/', icon: '📊' },
-    { name: 'Vision & Theme', path: '/vision', icon: '🎯' },
-    { name: 'Goals', path: '/goals', icon: '🎪' },
-    { name: 'KPIs', path: '/kpis', icon: '📈' },
-    { name: 'Non-Negotiables', path: '/non-negotiables', icon: '🛡️' },
-    { name: 'Systems', path: '/systems', icon: '⚙️' },
-    { name: 'People', path: '/people', icon: '👥' },
-    { name: 'Executions', path: '/executions', icon: '📅' },
-    { name: 'Obstacles', path: '/obstacles', icon: '🚧' },
-    { name: 'Reflections', path: '/reflections', icon: '🤔' },
+    { name: 'Dashboard', path: '/app', icon: '📊' },
+    { name: 'Vision & Theme', path: '/app/vision', icon: '🎯' },
+    { name: 'Goals', path: '/app/goals', icon: '🎪' },
+    { name: 'KPIs', path: '/app/kpis', icon: '📈' },
+    { name: 'Non-Negotiables', path: '/app/non-negotiables', icon: '🛡️' },
+    { name: 'Systems', path: '/app/systems', icon: '⚙️' },
+    { name: 'People', path: '/app/people', icon: '👥' },
+    { name: 'Executions', path: '/app/executions', icon: '📅' },
+    { name: 'Obstacles', path: '/app/obstacles', icon: '🚧' },
+    { name: 'Reflections', path: '/app/reflections', icon: '🤔' },
   ];
 
   const handleLogout = () => {
