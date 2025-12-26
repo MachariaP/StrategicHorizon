@@ -1,68 +1,48 @@
 import React, { useState } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { authApi } from '../api';
+import { useNavigate, Link } from 'react-router-dom';
+import { authAPI } from '../api';
 
 const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  
-  // Get success message from registration redirect
-  const successMessage = (location.state as any)?.message;
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      const response = await authApi.login(username, password);
-      
-      // Store tokens in localStorage
-      localStorage.setItem('accessToken', response.access);
-      localStorage.setItem('refreshToken', response.refresh);
-      
-      // Redirect to dashboard
+      const response = await authAPI.login(formData);
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
       navigate('/');
     } catch (err: any) {
-      console.error('Login failed:', err);
-      
-      if (err.response?.status === 401) {
-        setError('Invalid username or password');
-      } else if (err.name === 'NetworkError') {
-        setError(err.message);
-      } else {
-        setError('Login failed. Please try again.');
-      }
+      setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Strategic Planner</h1>
-          <p className="text-gray-600">Sign in to continue</p>
+          <h1 className="text-3xl font-bold text-gray-900">Strategic Horizon</h1>
+          <p className="text-gray-600 mt-2">Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          {successMessage && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
-              {successMessage}
-            </div>
-          )}
-          
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
 
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
               Username
@@ -70,12 +50,11 @@ const Login: React.FC = () => {
             <input
               id="username"
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="Enter your username"
               required
-              disabled={loading}
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter your username"
             />
           </div>
 
@@ -86,31 +65,35 @@ const Login: React.FC = () => {
             <input
               id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="Enter your password"
               required
-              disabled={loading}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter your password"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
             Don't have an account?{' '}
-            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">
-              Create one here
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+              Sign up
             </Link>
           </p>
+        </div>
+
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800 font-medium">Demo Account:</p>
+          <p className="text-xs text-blue-600 mt-1">Username: demo | Password: demo123</p>
         </div>
       </div>
     </div>
