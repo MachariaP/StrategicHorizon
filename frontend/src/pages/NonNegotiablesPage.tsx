@@ -20,26 +20,40 @@ const NonNegotiablesPage: React.FC = () => {
     fetchData();
   }, []);
 
-  if (loading) return <div className="p-8">Loading...</div>;
+  if (loading) return <div className="p-8 flex justify-center items-center min-h-screen">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <div className="text-xl text-gray-600 font-medium">Loading...</div>
+    </div>
+  </div>;
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className="p-8 bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 min-h-screen">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Non-Negotiables</h1>
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-8 animate-fadeIn">Non-Negotiables</h1>
         {items.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 text-center">
-            <span className="text-6xl mb-4 block">🛡️</span>
-            <p className="text-gray-600">No non-negotiables created yet.</p>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 text-center shadow-xl border border-white/20">
+            <span className="text-6xl mb-4 block animate-pulse">🛡️</span>
+            <p className="text-gray-600 text-lg">No non-negotiables created yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg p-6 shadow">
-                <span className="inline-block px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800 mb-3">
-                  {item.frequency.toUpperCase()}
-                </span>
+            {items.map((item, index) => (
+              <div key={item.id} className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 transform hover:-translate-y-1 animate-fadeIn" style={{ animationDelay: `${index * 0.05}s` }}>
+                <div className="flex items-center mb-3">
+                  <span className="text-3xl mr-3">🛡️</span>
+                  <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
+                    item.frequency === 'daily' 
+                      ? 'bg-gradient-to-r from-blue-400 to-blue-600 text-white'
+                      : item.frequency === 'weekly'
+                      ? 'bg-gradient-to-r from-purple-400 to-purple-600 text-white'
+                      : 'bg-gradient-to-r from-green-400 to-green-600 text-white'
+                  }`}>
+                    {item.frequency.toUpperCase()}
+                  </span>
+                </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm">{item.description}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
               </div>
             ))}
           </div>
