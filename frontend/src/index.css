@@ -53,6 +53,33 @@ code {
   }
 }
 
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes shake {
+    0%, 100% { transform: none; }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 .animate-shake {
   animation: shake 0.5s ease-in-out;
 }
