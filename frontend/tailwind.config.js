@@ -72,6 +72,7 @@ module.exports = {
         },
         'shimmer': {
           '0%': { backgroundPosition: '-200% center' },
+          '50%': { backgroundPosition: '0% center' },
           '100%': { backgroundPosition: '200% center' },
         },
       },
