@@ -1,286 +1,127 @@
 import axios from 'axios';
 import type {
-  Vision, Goal, KPI, NonNegotiable, System, Person,
-  Execution, Obstacle, QuarterlyReflection, AuthTokens,
-  UserRegistration, UserRegistrationResponse
+  User,
+  Vision,
+  Goal,
+  KPI,
+  NonNegotiable,
+  System,
+  Person,
+  Execution,
+  Obstacle,
+  QuarterlyReflection,
+  AuthTokens,
+  LoginCredentials,
+  RegisterData,
 } from './types';
 
-// Create axios instance with base configuration
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000',
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add auth token to requests if available
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+// Add token to requests if available
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
+  return config;
+});
 
-// Handle token refresh on 401 errors and connection errors
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    // Handle network/connection errors
-    if (!error.response) {
-      // Network error (e.g., ERR_CONNECTION_REFUSED, no internet)
-      const enhancedError = new Error(
-        `Unable to connect to the server. Please ensure the backend is running on ${
-          process.env.REACT_APP_API_URL || 'http://localhost:8000'
-        } or check your internet connection.`
-      );
-      enhancedError.name = 'NetworkError';
-      return Promise.reject(enhancedError);
-    }
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-          const response = await axios.post(
-            `${baseURL}/api/token/refresh/`,
-            { refresh: refreshToken }
-          );
-          const { access } = response.data;
-          localStorage.setItem('accessToken', access);
-          originalRequest.headers.Authorization = `Bearer ${access}`;
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        // Refresh failed, clear tokens and redirect to login
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
-
-// Authentication API
-export const authApi = {
-  login: async (username: string, password: string): Promise<AuthTokens> => {
-    const response = await api.post(
-      '/api/token/',
-      { username, password }
-    );
-    return response.data;
-  },
-  register: async (data: UserRegistration): Promise<UserRegistrationResponse> => {
-    const response = await api.post(
-      '/api/register/',
-      data
-    );
-    return response.data;
-  },
+// Auth API
+export const authAPI = {
+  login: (credentials: LoginCredentials) =>
+    api.post<AuthTokens>('/api/auth/login/', credentials),
+  register: (data: RegisterData) =>
+    api.post<User>('/api/auth/register/', data),
+  getUser: () =>
+    api.get<User>('/api/auth/user/'),
 };
 
 // Vision API
-export const visionApi = {
-  getAll: async (): Promise<Vision[]> => {
-    const response = await api.get('/api/visions/');
-    return response.data;
-  },
-  getById: async (id: number): Promise<Vision> => {
-    const response = await api.get(`/api/visions/${id}/`);
-    return response.data;
-  },
-  create: async (data: Partial<Vision>): Promise<Vision> => {
-    const response = await api.post('/api/visions/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<Vision>): Promise<Vision> => {
-    const response = await api.patch(`/api/visions/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/visions/${id}/`);
-  },
+export const visionAPI = {
+  getAll: () => api.get<Vision[]>('/api/vision/'),
+  getOne: (id: number) => api.get<Vision>(`/api/vision/${id}/`),
+  create: (data: Partial<Vision>) => api.post<Vision>('/api/vision/', data),
+  update: (id: number, data: Partial<Vision>) => api.put<Vision>(`/api/vision/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/vision/${id}/`),
 };
 
-// Goal API
-export const goalApi = {
-  getAll: async (): Promise<Goal[]> => {
-    const response = await api.get('/api/goals/');
-    return response.data;
-  },
-  getById: async (id: number): Promise<Goal> => {
-    const response = await api.get(`/api/goals/${id}/`);
-    return response.data;
-  },
-  getByStatus: async (status: string): Promise<Goal[]> => {
-    const response = await api.get(`/api/goals/by_status/?status=${status}`);
-    return response.data;
-  },
-  create: async (data: Partial<Goal>): Promise<Goal> => {
-    const response = await api.post('/api/goals/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<Goal>): Promise<Goal> => {
-    const response = await api.patch(`/api/goals/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/goals/${id}/`);
-  },
+// Goals API
+export const goalsAPI = {
+  getAll: () => api.get<Goal[]>('/api/goals/'),
+  getOne: (id: number) => api.get<Goal>(`/api/goals/${id}/`),
+  create: (data: Partial<Goal>) => api.post<Goal>('/api/goals/', data),
+  update: (id: number, data: Partial<Goal>) => api.put<Goal>(`/api/goals/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/goals/${id}/`),
 };
 
-// KPI API
-export const kpiApi = {
-  getAll: async (): Promise<KPI[]> => {
-    const response = await api.get('/api/kpis/');
-    return response.data;
-  },
-  getById: async (id: number): Promise<KPI> => {
-    const response = await api.get(`/api/kpis/${id}/`);
-    return response.data;
-  },
-  create: async (data: Partial<KPI>): Promise<KPI> => {
-    const response = await api.post('/api/kpis/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<KPI>): Promise<KPI> => {
-    const response = await api.patch(`/api/kpis/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/kpis/${id}/`);
-  },
+// KPIs API
+export const kpisAPI = {
+  getAll: () => api.get<KPI[]>('/api/kpis/'),
+  getOne: (id: number) => api.get<KPI>(`/api/kpis/${id}/`),
+  create: (data: Partial<KPI>) => api.post<KPI>('/api/kpis/', data),
+  update: (id: number, data: Partial<KPI>) => api.put<KPI>(`/api/kpis/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/kpis/${id}/`),
 };
 
 // Non-Negotiables API
-export const nonNegotiableApi = {
-  getAll: async (): Promise<NonNegotiable[]> => {
-    const response = await api.get('/api/non-negotiables/');
-    return response.data;
-  },
-  create: async (data: Partial<NonNegotiable>): Promise<NonNegotiable> => {
-    const response = await api.post('/api/non-negotiables/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<NonNegotiable>): Promise<NonNegotiable> => {
-    const response = await api.patch(`/api/non-negotiables/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/non-negotiables/${id}/`);
-  },
+export const nonNegotiablesAPI = {
+  getAll: () => api.get<NonNegotiable[]>('/api/non-negotiables/'),
+  getOne: (id: number) => api.get<NonNegotiable>(`/api/non-negotiables/${id}/`),
+  create: (data: Partial<NonNegotiable>) => api.post<NonNegotiable>('/api/non-negotiables/', data),
+  update: (id: number, data: Partial<NonNegotiable>) => api.put<NonNegotiable>(`/api/non-negotiables/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/non-negotiables/${id}/`),
 };
 
 // Systems API
-export const systemApi = {
-  getAll: async (): Promise<System[]> => {
-    const response = await api.get('/api/systems/');
-    return response.data;
-  },
-  create: async (data: Partial<System>): Promise<System> => {
-    const response = await api.post('/api/systems/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<System>): Promise<System> => {
-    const response = await api.patch(`/api/systems/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/systems/${id}/`);
-  },
+export const systemsAPI = {
+  getAll: () => api.get<System[]>('/api/systems/'),
+  getOne: (id: number) => api.get<System>(`/api/systems/${id}/`),
+  create: (data: Partial<System>) => api.post<System>('/api/systems/', data),
+  update: (id: number, data: Partial<System>) => api.put<System>(`/api/systems/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/systems/${id}/`),
 };
 
 // People API
-export const personApi = {
-  getAll: async (): Promise<Person[]> => {
-    const response = await api.get('/api/people/');
-    return response.data;
-  },
-  create: async (data: Partial<Person>): Promise<Person> => {
-    const response = await api.post('/api/people/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<Person>): Promise<Person> => {
-    const response = await api.patch(`/api/people/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/people/${id}/`);
-  },
+export const peopleAPI = {
+  getAll: () => api.get<Person[]>('/api/people/'),
+  getOne: (id: number) => api.get<Person>(`/api/people/${id}/`),
+  create: (data: Partial<Person>) => api.post<Person>('/api/people/', data),
+  update: (id: number, data: Partial<Person>) => api.put<Person>(`/api/people/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/people/${id}/`),
 };
 
 // Executions API
-export const executionApi = {
-  getAll: async (): Promise<Execution[]> => {
-    const response = await api.get('/api/executions/');
-    return response.data;
-  },
-  getByMonth: async (month: number, year: number): Promise<Execution[]> => {
-    const response = await api.get(`/api/executions/by_month/?month=${month}&year=${year}`);
-    return response.data;
-  },
-  create: async (data: Partial<Execution>): Promise<Execution> => {
-    const response = await api.post('/api/executions/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<Execution>): Promise<Execution> => {
-    const response = await api.patch(`/api/executions/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/executions/${id}/`);
-  },
+export const executionsAPI = {
+  getAll: () => api.get<Execution[]>('/api/executions/'),
+  getOne: (id: number) => api.get<Execution>(`/api/executions/${id}/`),
+  create: (data: Partial<Execution>) => api.post<Execution>('/api/executions/', data),
+  update: (id: number, data: Partial<Execution>) => api.put<Execution>(`/api/executions/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/executions/${id}/`),
 };
 
 // Obstacles API
-export const obstacleApi = {
-  getAll: async (): Promise<Obstacle[]> => {
-    const response = await api.get('/api/obstacles/');
-    return response.data;
-  },
-  create: async (data: Partial<Obstacle>): Promise<Obstacle> => {
-    const response = await api.post('/api/obstacles/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<Obstacle>): Promise<Obstacle> => {
-    const response = await api.patch(`/api/obstacles/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/obstacles/${id}/`);
-  },
+export const obstaclesAPI = {
+  getAll: () => api.get<Obstacle[]>('/api/obstacles/'),
+  getOne: (id: number) => api.get<Obstacle>(`/api/obstacles/${id}/`),
+  create: (data: Partial<Obstacle>) => api.post<Obstacle>('/api/obstacles/', data),
+  update: (id: number, data: Partial<Obstacle>) => api.put<Obstacle>(`/api/obstacles/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/obstacles/${id}/`),
 };
 
-// Quarterly Reflections API
-export const reflectionApi = {
-  getAll: async (): Promise<QuarterlyReflection[]> => {
-    const response = await api.get('/api/reflections/');
-    return response.data;
-  },
-  create: async (data: Partial<QuarterlyReflection>): Promise<QuarterlyReflection> => {
-    const response = await api.post('/api/reflections/', data);
-    return response.data;
-  },
-  update: async (id: number, data: Partial<QuarterlyReflection>): Promise<QuarterlyReflection> => {
-    const response = await api.patch(`/api/reflections/${id}/`, data);
-    return response.data;
-  },
-  delete: async (id: number): Promise<void> => {
-    await api.delete(`/api/reflections/${id}/`);
-  },
+// Reflections API
+export const reflectionsAPI = {
+  getAll: () => api.get<QuarterlyReflection[]>('/api/reflections/'),
+  getOne: (id: number) => api.get<QuarterlyReflection>(`/api/reflections/${id}/`),
+  create: (data: Partial<QuarterlyReflection>) => api.post<QuarterlyReflection>('/api/reflections/', data),
+  update: (id: number, data: Partial<QuarterlyReflection>) => api.put<QuarterlyReflection>(`/api/reflections/${id}/`, data),
+  delete: (id: number) => api.delete(`/api/reflections/${id}/`),
 };
 
 export default api;

@@ -1,73 +1,41 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { authApi } from '../api';
+import { authAPI } from '../api';
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
-    password_confirm: '',
+    password2: '',
     first_name: '',
     last_name: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (formData.password !== formData.password2) {
+      setError('Passwords do not match');
+      return;
+    }
+
     setLoading(true);
 
-    // Client-side validation
-    if (formData.password !== formData.password_confirm) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      setLoading(false);
-      return;
-    }
-
     try {
-      await authApi.register(formData);
-      
-      // After successful registration, redirect to login page
-      navigate('/login', { 
-        state: { message: 'Registration successful! Please log in with your credentials.' }
-      });
+      await authAPI.register(formData);
+      navigate('/login');
     } catch (err: any) {
-      console.error('Registration failed:', err);
-      
-      if (err.response?.data) {
-        // Handle validation errors from the backend
-        const errors = err.response.data;
-        if (typeof errors === 'object') {
-          const errorMessages = Object.entries(errors)
-            .map(([field, messages]: [string, any]) => {
-              if (Array.isArray(messages)) {
-                return `${field}: ${messages.join(', ')}`;
-              }
-              return `${field}: ${messages}`;
-            })
-            .join('\n');
-          setError(errorMessages);
-        } else {
-          setError('Registration failed. Please try again.');
-        }
-      } else if (err.name === 'NetworkError') {
-        setError(err.message);
+      const errorData = err.response?.data;
+      if (errorData) {
+        const errorMessages = Object.entries(errorData)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(', ');
+        setError(errorMessages);
       } else {
         setError('Registration failed. Please try again.');
       }
@@ -77,34 +45,31 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
-      <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Strategic Planner</h1>
-          <p className="text-gray-600">Create your account</p>
+          <h1 className="text-3xl font-bold text-gray-900">Strategic Horizon</h1>
+          <p className="text-gray-600 mt-2">Create your account</p>
         </div>
 
-        <form onSubmit={handleRegister} className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm whitespace-pre-line">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
 
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
               Username *
             </label>
             <input
               id="username"
-              name="username"
               type="text"
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="Enter your username"
               required
-              disabled={loading}
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -114,14 +79,11 @@ const Register: React.FC = () => {
             </label>
             <input
               id="email"
-              name="email"
               type="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="Enter your email"
               required
-              disabled={loading}
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -132,13 +94,10 @@ const Register: React.FC = () => {
               </label>
               <input
                 id="first_name"
-                name="first_name"
                 type="text"
                 value={formData.first_name}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                placeholder="First name"
-                disabled={loading}
+                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -148,13 +107,10 @@ const Register: React.FC = () => {
               </label>
               <input
                 id="last_name"
-                name="last_name"
                 type="text"
                 value={formData.last_name}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-                placeholder="Last name"
-                disabled={loading}
+                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -165,48 +121,42 @@ const Register: React.FC = () => {
             </label>
             <input
               id="password"
-              name="password"
               type="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="Enter your password (min 8 characters)"
               required
-              disabled={loading}
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label htmlFor="password_confirm" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="password2" className="block text-sm font-medium text-gray-700 mb-2">
               Confirm Password *
             </label>
             <input
-              id="password_confirm"
-              name="password_confirm"
+              id="password2"
               type="password"
-              value={formData.password_confirm}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="Confirm your password"
               required
-              disabled={loading}
+              value={formData.password2}
+              onChange={(e) => setFormData({ ...formData, password2: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
             Already have an account?{' '}
-            <Link to="/login" className="text-blue-600 hover:text-blue-700 font-semibold">
-              Sign In
+            <Link to="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+              Sign in
             </Link>
           </p>
         </div>

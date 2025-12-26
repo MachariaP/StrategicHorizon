@@ -1,188 +1,289 @@
-# 2026 Strategic Planner
+# Strategic Horizon - 2026 Strategic Planner
 
-A comprehensive full-stack productivity application designed to help users move from high-level vision to monthly execution. Built with Django Rest Framework (backend) and React with TypeScript (frontend).
+A comprehensive full-stack strategic planning application that helps users transform their vision into actionable monthly executions. Built with Django REST Framework and React with TypeScript.
 
-## 🏗️ Architecture Overview
+## 🎯 Overview
+
+Strategic Horizon is designed to help individuals and teams move from high-level vision to monthly execution through a structured planning framework. The application provides 10 core modules:
+
+1. **Dashboard** - Overview of all planning elements
+2. **Vision & Theme** - Yearly "North Star" statement and theme
+3. **Goals** - Specific, measurable milestones with status tracking
+4. **KPIs** - Key Performance Indicators linked to goals
+5. **Non-Negotiables** - Daily/weekly boundaries or rules
+6. **Systems** - Recurring processes and habits
+7. **People** - Directory of mentors, partners, and supporters
+8. **Executions** - Monthly roadmap (Jan–Dec) with task assignments
+9. **Obstacles & Mitigations** - Pre-Mortem risk identification
+10. **Quarterly Reflections** - Review module for Q1–Q4 pivots
+
+## 🏗️ Architecture
 
 ### Technology Stack
 
 **Backend:**
-- Django 4.2.8
-- Django Rest Framework 3.14.0
+- Django 6.0
+- Django REST Framework 3.16.1
 - SimpleJWT for authentication
 - PostgreSQL database
-- Python 3.11
+- Python 3.12
 
 **Frontend:**
 - React 18 with TypeScript
 - Tailwind CSS for styling
 - React Router for navigation
-- TanStack Query (React Query) for data fetching
 - Axios for API communication
 
-**Infrastructure:**
-- PostgreSQL 15
-- Gunicorn (production WSGI server)
+### Project Structure
 
-## 📋 Features & Data Models
-
-The application includes the following core modules:
-
-1. **Vision & Theme** - Yearly "North Star" statement and theme
-2. **Goals** - Specific, measurable milestones with status tracking
-3. **KPIs** - Key Performance Indicators linked to goals (Target vs. Actual)
-4. **Non-Negotiables** - Daily/weekly boundaries or rules
-5. **Systems** - Recurring processes and habits
-6. **People** - Directory of mentors, partners, and supporters
-7. **Executions** - Monthly roadmap (Jan–Dec) with task assignments
-8. **Obstacles & Mitigations** - Pre-Mortem risk identification
-9. **Quarterly Reflections** - Review module for Q1–Q4 pivots
-
-All models include multi-tenancy support via ForeignKey to the User model.
+```
+StrategicHorizon/
+├── backend/
+│   ├── strategic_horizon/      # Django project settings
+│   ├── auth_app/               # Authentication & user management
+│   ├── vision/                 # Vision & Theme module
+│   ├── goals/                  # Goals module
+│   ├── kpis/                   # KPIs module
+│   ├── non_negotiables/        # Non-Negotiables module
+│   ├── systems/                # Systems module
+│   ├── people/                 # People module
+│   ├── executions/             # Executions module
+│   ├── obstacles/              # Obstacles module
+│   ├── reflections/            # Quarterly Reflections module
+│   ├── manage.py
+│   └── requirements.txt
+└── frontend/
+    ├── src/
+    │   ├── components/         # Reusable UI components
+    │   │   └── Sidebar.tsx     # Navigation sidebar
+    │   ├── pages/              # Page components
+    │   │   ├── Login.tsx
+    │   │   ├── Register.tsx
+    │   │   ├── Dashboard.tsx
+    │   │   ├── VisionPage.tsx
+    │   │   ├── GoalsPage.tsx
+    │   │   ├── KPIsPage.tsx
+    │   │   ├── NonNegotiablesPage.tsx
+    │   │   ├── SystemsPage.tsx
+    │   │   ├── PeoplePage.tsx
+    │   │   ├── ExecutionsPage.tsx
+    │   │   ├── ObstaclesPage.tsx
+    │   │   └── ReflectionsPage.tsx
+    │   ├── api.ts              # API client and endpoints
+    │   ├── types.ts            # TypeScript interfaces
+    │   └── App.tsx             # Main app component
+    ├── package.json
+    └── .env
+```
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.12+
 - Node.js 18+
 - PostgreSQL 15+
 - Git
 
-### Installation & Setup
+### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/MachariaP/StrategicHorizon.git
-   cd StrategicHorizon
-   ```
+#### 1. Clone the repository
 
-2. **Set up PostgreSQL database**
-   
-   Install PostgreSQL and create a database:
-   ```bash
-   # On Ubuntu/Debian
-   sudo apt-get install postgresql postgresql-contrib
-   
-   # On macOS
-   brew install postgresql
-   
-   # Create database (using default postgres superuser)
-   sudo -u postgres psql
-   CREATE DATABASE strategic_planner;
-   ALTER USER postgres WITH PASSWORD 'postgres';
-   GRANT ALL PRIVILEGES ON DATABASE strategic_planner TO postgres;
-   \q
-   ```
-   
-   **Note:** For production, create a dedicated database user with a strong password.
+```bash
+git clone https://github.com/MachariaP/StrategicHorizon.git
+cd StrategicHorizon
+```
 
-3. **Configure environment variables**
-   ```bash
-   cd backend
-   cp .env.example .env
-   ```
-   
-   Edit the `.env` file if needed. The default values are:
-   ```
-   DATABASE_HOST=localhost
-   DATABASE_PORT=5432
-   DATABASE_NAME=strategic_planner
-   DATABASE_USER=postgres
-   DATABASE_PASSWORD=postgres
-   ```
+#### 2. Set up PostgreSQL database
 
-4. **Set up Python backend**
-   ```bash
-   cd backend
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   pip install -r requirements.txt
-   python manage.py migrate
-   python manage.py createsuperuser
-   python manage.py runserver
-   ```
+```bash
+# On Ubuntu/Debian
+sudo apt-get install postgresql postgresql-contrib
 
-5. **Set up React frontend** (in a new terminal)
-   ```bash
-   cd frontend
-   npm install
-   npm start
-   ```
+# On macOS
+brew install postgresql
+brew services start postgresql
 
-6. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000/api/
-   - Admin Panel: http://localhost:8000/admin/
+# Create database
+sudo -u postgres psql
+CREATE DATABASE strategic_planner;
+ALTER USER postgres WITH PASSWORD 'postgres';
+GRANT ALL PRIVILEGES ON DATABASE strategic_planner TO postgres;
+\q
+```
 
-## 🔧 Troubleshooting
+#### 3. Set up Backend
 
-### Database Connection Issues
+```bash
+cd backend
 
-**Problem:** `could not translate host name to address` or connection errors
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-**Solution:** 
+# Install dependencies
+pip install -r requirements.txt
 
-1. **Create a .env file** in the `backend/` directory:
-   ```bash
-   cd backend
-   cp .env.example .env
-   ```
+# The .env file should already exist with database configuration
+# If not, create it with:
+# DATABASE_NAME=strategic_planner
+# DATABASE_USER=postgres
+# DATABASE_PASSWORD=postgres
+# DATABASE_HOST=localhost
+# DATABASE_PORT=5432
 
-2. **Verify DATABASE_HOST is set correctly** in your `.env` file:
-   ```
-   DATABASE_HOST=localhost
-   ```
+# Run migrations
+python manage.py migrate
 
-3. **Ensure PostgreSQL is running locally:**
-   ```bash
-   # On Ubuntu/Debian
-   sudo systemctl status postgresql
-   sudo systemctl start postgresql
-   
-   # On macOS
-   brew services list
-   brew services start postgresql
-   ```
+# Seed the database with sample data
+python manage.py seed_data
 
-4. **Verify database exists:**
-   ```bash
-   psql -U postgres -h localhost
-   \l  # List databases
-   \q  # Quit
-   ```
+# Start the development server
+python manage.py runserver
+```
+
+The backend will be available at http://localhost:8000
+
+#### 4. Set up Frontend
+
+```bash
+cd frontend
+
+# Install dependencies
+npm install
+
+# The .env file should already exist with:
+# REACT_APP_API_URL=http://localhost:8000
+
+# Start the development server
+npm start
+```
+
+The frontend will be available at http://localhost:3000
+
+## 🎨 UI Screenshots & Examples
+
+### Login Page
+The login page provides a clean, modern interface for user authentication with demo credentials displayed for easy access.
+
+### Dashboard
+The dashboard provides a comprehensive overview:
+- **Vision Card**: Displays the yearly theme and north star statement
+- **Statistics**: Shows total goals, goals in progress, completed goals, and average KPI progress
+- **Recent Goals**: List of the most recent goals with their status
+- **Upcoming Executions**: Preview of planned executions for the coming months
+- **KPI Progress**: Visual progress bars showing actual vs. target values
+
+### Vision & Theme Page
+Displays the yearly vision statement and theme in an attractive card format with emoji icons for visual appeal.
+
+### Goals Page
+Goals are displayed in a grid layout with:
+- Goal title and description
+- Status badges (Pending, In Progress, Completed)
+- Target dates
+- Color-coded status indicators
+
+### KPIs Page
+Each KPI shows:
+- Name and description
+- Progress percentage
+- Visual progress bar
+- Actual value vs. target value
+- Unit of measurement
+
+### Non-Negotiables Page
+Displayed in a grid of cards showing:
+- Frequency (Daily, Weekly, Monthly)
+- Title and description
+- Color-coded frequency badges
+
+### Systems Page
+Systems are shown as detailed cards including:
+- System name
+- Description
+- Frequency information
+- System icon
+
+### People Page
+People directory shows:
+- Name and role
+- Role description
+- Contact information
+- Notes and additional details
+- Profile icon
+
+### Executions Page
+Monthly executions displayed in a grid with:
+- Month and year
+- Title and description
+- Status indicators (Planned, In Progress, Completed, Deferred)
+- Color-coded status badges
+
+### Obstacles Page
+Obstacles are shown with:
+- Title and severity level
+- Problem description
+- Mitigation strategy
+- Color-coded severity indicators (Low, Medium, High, Critical)
+
+### Reflections Page
+Quarterly reflections show four key sections:
+- ✅ Wins
+- ⚠️ Challenges
+- 💡 Lessons Learned
+- 🎯 Adjustments
+
+Each section is clearly labeled and color-coded for easy scanning.
 
 ## 🔐 Authentication
 
-The API uses JWT (JSON Web Tokens) for authentication:
+### Demo Account
 
-1. **Obtain tokens:**
-   ```bash
-   POST http://localhost:8000/api/token/
-   {
-     "username": "your_username",
-     "password": "your_password"
-   }
-   ```
+A demo account is created when you seed the database:
+- **Username:** demo
+- **Password:** demo123
 
-2. **Refresh token:**
-   ```bash
-   POST http://localhost:8000/api/token/refresh/
-   {
-     "refresh": "your_refresh_token"
-   }
-   ```
+### API Endpoints
 
-3. **Use access token in requests:**
-   ```
-   Authorization: Bearer <access_token>
-   ```
+Authentication uses JWT tokens:
 
-## 📡 API Endpoints
+```bash
+# Login
+POST /api/auth/login/
+{
+  "username": "demo",
+  "password": "demo123"
+}
+
+# Register
+POST /api/auth/register/
+{
+  "username": "newuser",
+  "email": "user@example.com",
+  "password": "securepassword",
+  "password2": "securepassword"
+}
+
+# Get current user
+GET /api/auth/user/
+Authorization: Bearer <access_token>
+```
+
+## 📡 API Documentation
 
 All API endpoints are prefixed with `/api/`:
 
-- `/api/visions/` - Vision & Theme management
+### Authentication
+- `POST /api/auth/login/` - Login
+- `POST /api/auth/register/` - Register new user
+- `POST /api/auth/token/refresh/` - Refresh access token
+- `GET /api/auth/user/` - Get current user info
+
+### Data Modules
+Each module supports standard REST operations (GET, POST, PUT, DELETE):
+
+- `/api/vision/` - Vision & Theme management
 - `/api/goals/` - Goals CRUD operations
 - `/api/kpis/` - KPI tracking
 - `/api/non-negotiables/` - Non-negotiables management
@@ -192,133 +293,119 @@ All API endpoints are prefixed with `/api/`:
 - `/api/obstacles/` - Obstacles & mitigations
 - `/api/reflections/` - Quarterly reflections
 
-Each endpoint supports standard REST operations (GET, POST, PUT, PATCH, DELETE).
+## 🗄️ Data Seeding
 
-## 🎨 Frontend Structure
-
-```
-frontend/
-├── src/
-│   ├── components/      # Reusable UI components
-│   │   └── Sidebar.tsx  # Navigation sidebar
-│   ├── pages/           # Page components
-│   │   ├── Dashboard.tsx        # Main dashboard view
-│   │   └── ExecutionsView.tsx   # 12-month execution grid
-│   ├── api.ts           # API client and endpoints
-│   ├── types.ts         # TypeScript interfaces
-│   └── App.tsx          # Main app component
-└── ...
-```
-
-## 🗄️ Backend Structure
-
-```
-backend/
-├── strategic_planner/   # Django project settings
-│   ├── settings.py      # Configuration (CORS, JWT, DB)
-│   └── urls.py          # Main URL routing
-├── planner/             # Main Django app
-│   ├── models.py        # Data models
-│   ├── serializers.py   # DRF serializers
-│   ├── views.py         # ViewSets
-│   ├── urls.py          # App URL routing
-│   └── admin.py         # Admin panel configuration
-└── manage.py
-```
-
-## 🛠️ Development Commands
-
-### Backend (Django)
+The project includes a comprehensive data seeding command that creates sample data for all modules:
 
 ```bash
-# Activate virtual environment
-cd backend
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+python manage.py seed_data
+```
 
-# Run migrations
+This command:
+- Creates a demo user (username: demo, password: demo123)
+- Seeds sample data for all 9 modules
+- Creates realistic example data with proper relationships
+
+## 🔧 Development
+
+### Backend Commands
+
+```bash
+# Create migrations
+python manage.py makemigrations
+
+# Apply migrations
 python manage.py migrate
 
-# Create migrations after model changes
-python manage.py makemigrations
+# Create superuser for admin panel
+python manage.py createsuperuser
 
 # Access Django shell
 python manage.py shell
 
-# Run tests
-python manage.py test
-
-# Start development server
+# Run development server
 python manage.py runserver
 ```
 
-### Frontend (React)
+### Frontend Commands
 
 ```bash
-cd frontend
-
 # Install new packages
 npm install <package-name>
 
-# Run linting
-npm run lint
+# Start development server
+npm start
 
 # Build for production
 npm run build
 
-# Start development server
-npm start
+# Run tests
+npm test
 ```
 
-## 📝 Code Quality Standards
+## 🌟 Key Features
 
-### Python (PEP 8)
-- Use 4 spaces for indentation
-- Maximum line length: 79 characters
-- Follow Django naming conventions
+### Separate Apps Architecture
+Each functional area is organized into its own Django app, promoting:
+- **Modularity**: Each app is self-contained with its own models, views, and serializers
+- **Maintainability**: Easy to update individual modules without affecting others
+- **Scalability**: New features can be added as new apps
+- **Code Organization**: Clear separation of concerns
 
-### TypeScript/React
-- Use ESLint and Prettier for code formatting
-- Strict type checking enabled
-- Follow functional component patterns
-- Use React hooks for state management
+### Data Relationships
+The modules are interconnected:
+- Goals can be linked to Visions
+- KPIs are linked to Goals
+- Executions can reference Goals
+- Obstacles can be associated with Goals
+
+### Authentication & Security
+- JWT-based authentication
+- Token refresh mechanism
+- Password validation
+- User-specific data isolation
+- CORS configuration for frontend-backend communication
+
+### User Experience
+- Responsive design with Tailwind CSS
+- Intuitive navigation with sidebar
+- Real-time data updates
+- Visual progress indicators
+- Color-coded status badges
+- Emoji icons for visual appeal
 
 ## 🔒 Security Considerations
 
-- Sensitive credentials stored in `.env` file (excluded from Git)
-- JWT tokens for secure API authentication
-- CORS properly configured for frontend-backend communication
-- Django secret key should be changed in production
-- Database credentials should be updated for production use
+- All API endpoints require authentication (except login/register)
+- JWT tokens for secure authentication
+- CORS properly configured
+- Database credentials stored in .env file
+- User data isolation (users can only see their own data)
 
-## 🌐 Production Deployment
+## 📚 Tech Stack Details
 
-For production deployment:
+### Backend Technologies
+- **Django 6.0**: Web framework
+- **Django REST Framework**: API development
+- **SimpleJWT**: JWT authentication
+- **PostgreSQL**: Database
+- **python-dotenv**: Environment variable management
+- **CORS Headers**: Cross-origin resource sharing
 
-1. Set `DEBUG=False` in settings
-2. Update `SECRET_KEY` to a secure random value
-3. Configure proper `ALLOWED_HOSTS`
-4. Use production-grade database credentials
-5. Set up HTTPS/SSL certificates
-6. Use Gunicorn with Nginx as reverse proxy
-7. Enable Django's security middleware
-8. Set up proper logging and monitoring
-
-## 📚 Additional Resources
-
-- [Django Documentation](https://docs.djangoproject.com/)
-- [Django Rest Framework](https://www.django-rest-framework.org/)
-- [React Documentation](https://react.dev/)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Tailwind CSS](https://tailwindcss.com/docs)
+### Frontend Technologies
+- **React 18**: UI library
+- **TypeScript**: Type safety
+- **React Router**: Client-side routing
+- **Axios**: HTTP client
+- **Tailwind CSS**: Utility-first CSS framework
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Write/update tests
-5. Ensure code passes linting
-6. Submit a pull request
+4. Test thoroughly
+5. Submit a pull request
 
 ## 📄 License
 
@@ -328,6 +415,20 @@ This project is open source and available under the MIT License.
 
 - MachariaP
 
+## 🙏 Acknowledgments
+
+Built with modern best practices:
+- Separate Django apps for each feature
+- RESTful API design
+- TypeScript for type safety
+- Real database seeding instead of mocked data
+- Comprehensive documentation
+
 ---
 
-**Note:** This application is designed for development and educational purposes. Ensure proper security measures are implemented before deploying to production.
+**Note:** This is a development version. For production deployment, ensure proper security measures including:
+- Changing SECRET_KEY
+- Setting DEBUG=False
+- Using strong database passwords
+- Implementing HTTPS
+- Setting up proper hosting
