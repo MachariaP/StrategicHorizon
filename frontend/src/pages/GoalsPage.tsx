@@ -33,7 +33,7 @@ const GoalsPage: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
       {/* Header Section */}
       <div className="relative bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 text-white py-16 px-8 shadow-xl overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 opacity-50 animate-shimmer" style={{backgroundSize: '200% 100%}}></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-green-600 via-blue-600 to-purple-600 opacity-50 animate-shimmer" style={{backgroundSize: '200% 100%'}}></div>
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="flex items-center space-x-5 mb-4 animate-fade-in-up">
             <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
