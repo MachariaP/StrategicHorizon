@@ -20,43 +20,66 @@ const GoalsPage: React.FC = () => {
     fetchGoals();
   }, []);
 
-  if (loading) return <div className="p-8">Loading...</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      <div className="text-xl text-gray-600">Loading goals...</div>
+    </div>
+  );
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Goals</h1>
-        {goals.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 text-center">
-            <span className="text-6xl mb-4 block">🎪</span>
-            <p className="text-gray-600">No goals created yet.</p>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white py-12 px-8 shadow-lg">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center space-x-4 mb-3">
+            <span className="text-5xl">🎪</span>
+            <h1 className="text-5xl font-bold">Goals</h1>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {goals.map((goal) => (
-              <div key={goal.id} className="bg-white rounded-lg p-6 shadow">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-xl font-bold text-gray-900">{goal.title}</h3>
-                  <span
-                    className={`px-3 py-1 text-xs rounded-full ${
-                      goal.status === 'completed'
-                        ? 'bg-green-100 text-green-800'
-                        : goal.status === 'in_progress'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {goal.status.replace('_', ' ').toUpperCase()}
-                  </span>
+          <p className="text-green-100 text-lg">Track your specific, measurable milestones</p>
+        </div>
+      </div>
+
+      <div className="p-8">
+        <div className="max-w-6xl mx-auto">
+          {goals.length === 0 ? (
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 text-center shadow-xl border border-blue-100">
+              <span className="text-8xl mb-6 block animate-pulse">🎪</span>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">No Goals Yet</h3>
+              <p className="text-gray-600">Create your first goal to start tracking your progress.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {goals.map((goal) => (
+                <div key={goal.id} className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-blue-100 hover:shadow-2xl transition-all hover:scale-[1.03]">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="bg-gradient-to-br from-green-500 to-blue-500 rounded-xl p-3">
+                      <span className="text-3xl">🎯</span>
+                    </div>
+                    <span
+                      className={`px-3 py-1 text-xs font-semibold rounded-full shadow-sm ${
+                        goal.status === 'completed'
+                          ? 'bg-gradient-to-r from-green-400 to-emerald-400 text-white'
+                          : goal.status === 'in_progress'
+                          ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-white'
+                          : 'bg-gradient-to-r from-gray-400 to-gray-500 text-white'
+                      }`}
+                    >
+                      {goal.status.replace('_', ' ').toUpperCase()}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{goal.title}</h3>
+                  <p className="text-gray-600 mb-4 line-clamp-3">{goal.description}</p>
+                  {goal.target_date && (
+                    <div className="flex items-center text-sm text-gray-500 bg-blue-50 rounded-lg px-3 py-2">
+                      <span className="mr-2">📅</span>
+                      <span className="font-medium">Target: {new Date(goal.target_date).toLocaleDateString()}</span>
+                    </div>
+                  )}
                 </div>
-                <p className="text-gray-600 mb-4">{goal.description}</p>
-                {goal.target_date && (
-                  <p className="text-sm text-gray-500">Target: {new Date(goal.target_date).toLocaleDateString()}</p>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
