@@ -1,100 +1,101 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+// Define features outside component to prevent recreation on each render
+const FEATURES = [
+  {
+    icon: '🎯',
+    title: 'Vision & Theme',
+    description: 'Define your yearly "North Star" statement and theme to guide your journey',
+    gradient: 'from-blue-500 to-purple-600',
+    bgGradient: 'from-blue-500/20 to-purple-600/20',
+  },
+  {
+    icon: '🎪',
+    title: 'Goals',
+    description: 'Set specific, measurable milestones with comprehensive status tracking',
+    gradient: 'from-purple-500 to-pink-600',
+    bgGradient: 'from-purple-500/20 to-pink-600/20',
+  },
+  {
+    icon: '📈',
+    title: 'KPIs',
+    description: 'Track Key Performance Indicators linked directly to your goals',
+    gradient: 'from-green-500 to-teal-600',
+    bgGradient: 'from-green-500/20 to-teal-600/20',
+  },
+  {
+    icon: '⚖️',
+    title: 'Non-Negotiables',
+    description: 'Establish daily and weekly boundaries that keep you on track',
+    gradient: 'from-orange-500 to-red-600',
+    bgGradient: 'from-orange-500/20 to-red-600/20',
+  },
+  {
+    icon: '⚙️',
+    title: 'Systems',
+    description: 'Build recurring processes and habits that drive consistent progress',
+    gradient: 'from-cyan-500 to-blue-600',
+    bgGradient: 'from-cyan-500/20 to-blue-600/20',
+  },
+  {
+    icon: '👥',
+    title: 'People',
+    description: 'Maintain a directory of mentors, partners, and supporters',
+    gradient: 'from-pink-500 to-rose-600',
+    bgGradient: 'from-pink-500/20 to-rose-600/20',
+  },
+  {
+    icon: '🚀',
+    title: 'Executions',
+    description: 'Plan your monthly roadmap from January to December',
+    gradient: 'from-indigo-500 to-purple-600',
+    bgGradient: 'from-indigo-500/20 to-purple-600/20',
+  },
+  {
+    icon: '🛡️',
+    title: 'Obstacles',
+    description: 'Identify risks and create mitigation strategies through pre-mortem analysis',
+    gradient: 'from-yellow-500 to-orange-600',
+    bgGradient: 'from-yellow-500/20 to-orange-600/20',
+  },
+  {
+    icon: '🔄',
+    title: 'Quarterly Reflections',
+    description: 'Review and pivot with structured Q1-Q4 reflection modules',
+    gradient: 'from-teal-500 to-green-600',
+    bgGradient: 'from-teal-500/20 to-green-600/20',
+  },
+  {
+    icon: '📊',
+    title: 'Dashboard',
+    description: 'Get a comprehensive overview of all your planning elements at a glance',
+    gradient: 'from-violet-500 to-purple-600',
+    bgGradient: 'from-violet-500/20 to-purple-600/20',
+  },
+];
+
 const LandingPage: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const features = [
-    {
-      icon: '🎯',
-      title: 'Vision & Theme',
-      description: 'Define your yearly "North Star" statement and theme to guide your journey',
-      gradient: 'from-blue-500 to-purple-600',
-      bgGradient: 'from-blue-500/20 to-purple-600/20',
-    },
-    {
-      icon: '🎪',
-      title: 'Goals',
-      description: 'Set specific, measurable milestones with comprehensive status tracking',
-      gradient: 'from-purple-500 to-pink-600',
-      bgGradient: 'from-purple-500/20 to-pink-600/20',
-    },
-    {
-      icon: '📈',
-      title: 'KPIs',
-      description: 'Track Key Performance Indicators linked directly to your goals',
-      gradient: 'from-green-500 to-teal-600',
-      bgGradient: 'from-green-500/20 to-teal-600/20',
-    },
-    {
-      icon: '⚖️',
-      title: 'Non-Negotiables',
-      description: 'Establish daily and weekly boundaries that keep you on track',
-      gradient: 'from-orange-500 to-red-600',
-      bgGradient: 'from-orange-500/20 to-red-600/20',
-    },
-    {
-      icon: '⚙️',
-      title: 'Systems',
-      description: 'Build recurring processes and habits that drive consistent progress',
-      gradient: 'from-cyan-500 to-blue-600',
-      bgGradient: 'from-cyan-500/20 to-blue-600/20',
-    },
-    {
-      icon: '👥',
-      title: 'People',
-      description: 'Maintain a directory of mentors, partners, and supporters',
-      gradient: 'from-pink-500 to-rose-600',
-      bgGradient: 'from-pink-500/20 to-rose-600/20',
-    },
-    {
-      icon: '🚀',
-      title: 'Executions',
-      description: 'Plan your monthly roadmap from January to December',
-      gradient: 'from-indigo-500 to-purple-600',
-      bgGradient: 'from-indigo-500/20 to-purple-600/20',
-    },
-    {
-      icon: '🛡️',
-      title: 'Obstacles',
-      description: 'Identify risks and create mitigation strategies through pre-mortem analysis',
-      gradient: 'from-yellow-500 to-orange-600',
-      bgGradient: 'from-yellow-500/20 to-orange-600/20',
-    },
-    {
-      icon: '🔄',
-      title: 'Quarterly Reflections',
-      description: 'Review and pivot with structured Q1-Q4 reflection modules',
-      gradient: 'from-teal-500 to-green-600',
-      bgGradient: 'from-teal-500/20 to-green-600/20',
-    },
-    {
-      icon: '📊',
-      title: 'Dashboard',
-      description: 'Get a comprehensive overview of all your planning elements at a glance',
-      gradient: 'from-violet-500 to-purple-600',
-      bgGradient: 'from-violet-500/20 to-purple-600/20',
-    },
-  ];
-
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % features.length);
+      setCurrentSlide((prev) => (prev + 1) % FEATURES.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [features.length]);
+  }, []);
 
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % features.length);
+    setCurrentSlide((prev) => (prev + 1) % FEATURES.length);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + features.length) % features.length);
+    setCurrentSlide((prev) => (prev - 1 + FEATURES.length) % FEATURES.length);
   };
 
   return (
@@ -216,7 +217,7 @@ const LandingPage: React.FC = () => {
           <div className="relative">
             <div className="overflow-hidden rounded-3xl">
               <div className="relative h-[400px] sm:h-[500px] md:h-[600px]">
-                {features.map((feature, index) => (
+                {FEATURES.map((feature, index) => (
                   <div
                     key={index}
                     className={`absolute inset-0 transition-all duration-700 ease-in-out ${
@@ -237,8 +238,8 @@ const LandingPage: React.FC = () => {
                       <p className="text-lg sm:text-xl md:text-2xl text-purple-100 max-w-2xl leading-relaxed">
                         {feature.description}
                       </p>
-                      <div className={`mt-6 sm:mt-8 inline-block bg-gradient-to-r ${feature.gradient} text-white px-6 py-3 rounded-full font-semibold shadow-lg`}>
-                        Explore Feature
+                      <div className={`mt-6 sm:mt-8 inline-block bg-gradient-to-r ${feature.gradient} text-white px-6 py-3 rounded-full font-semibold shadow-lg opacity-75 cursor-default`}>
+                        Feature Showcase
                       </div>
                     </div>
                   </div>
@@ -268,7 +269,7 @@ const LandingPage: React.FC = () => {
 
             {/* Dots Indicator */}
             <div className="flex justify-center mt-6 sm:mt-8 gap-2 flex-wrap px-4">
-              {features.map((_, index) => (
+              {FEATURES.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
@@ -298,11 +299,11 @@ const LandingPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {features.map((feature, index) => (
+            {FEATURES.map((feature, index) => (
               <div
                 key={index}
-                className={`bg-gradient-to-br ${feature.bgGradient} backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all hover:scale-105 hover:shadow-2xl group animate-fade-in-up`}
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className={`bg-gradient-to-br ${feature.bgGradient} backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:border-white/30 transition-all hover:scale-105 hover:shadow-2xl group feature-card`}
+                style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <div className={`text-4xl sm:text-5xl mb-4 bg-gradient-to-br ${feature.gradient} rounded-xl p-4 inline-block group-hover:scale-110 transition-transform`}>
                   {feature.icon}
