@@ -20,33 +20,58 @@ const VisionPage: React.FC = () => {
     fetchVisions();
   }, []);
 
-  if (loading) return <div className="p-8">Loading...</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="text-xl text-gray-600">Loading visions...</div>
+    </div>
+  );
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Vision & Theme</h1>
-        {visions.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 text-center">
-            <span className="text-6xl mb-4 block">🎯</span>
-            <p className="text-gray-600">No visions created yet.</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 px-8 shadow-lg">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-center space-x-4 mb-3">
+            <span className="text-5xl">🎯</span>
+            <h1 className="text-5xl font-bold">Vision & Theme</h1>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {visions.map((vision) => (
-              <div key={vision.id} className="bg-white rounded-lg p-8 shadow">
-                <div className="flex items-center mb-4">
-                  <span className="text-4xl mr-4">🎯</span>
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900">{vision.yearly_theme}</h2>
-                    <p className="text-gray-600">{vision.year}</p>
+          <p className="text-blue-100 text-lg">Define your North Star and yearly theme</p>
+        </div>
+      </div>
+
+      <div className="p-8">
+        <div className="max-w-5xl mx-auto">
+          {visions.length === 0 ? (
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-12 text-center shadow-xl border border-purple-100">
+              <span className="text-8xl mb-6 block animate-pulse">🎯</span>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">No Visions Yet</h3>
+              <p className="text-gray-600">Start by creating your vision and yearly theme to guide your journey.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {visions.map((vision) => (
+                <div key={vision.id} className="bg-white/80 backdrop-blur-sm rounded-2xl p-10 shadow-xl border border-purple-100 hover:shadow-2xl transition-all hover:scale-[1.02]">
+                  <div className="flex items-center mb-6">
+                    <div className="bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl p-4 mr-6">
+                      <span className="text-5xl">🎯</span>
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+                        {vision.yearly_theme}
+                      </h2>
+                      <p className="text-xl text-gray-600 font-semibold">{vision.year}</p>
+                    </div>
+                  </div>
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border-l-4 border-purple-500">
+                    <p className="text-xl text-gray-700 italic leading-relaxed">
+                      &ldquo;{vision.north_star}&rdquo;
+                    </p>
                   </div>
                 </div>
-                <p className="text-lg text-gray-700 italic">&ldquo;{vision.north_star}&rdquo;</p>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ const Login: React.FC = () => {
       const response = await authAPI.login(formData);
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
-      navigate('/');
+      navigate('/app');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
     } finally {
@@ -29,22 +29,27 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-purple-100">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Strategic Horizon</h1>
-          <p className="text-gray-600 mt-2">Sign in to your account</p>
+          <div className="flex items-center justify-center mb-4">
+            <span className="text-5xl mr-2">🌟</span>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
+              Strategic Horizon
+            </h1>
+          </div>
+          <p className="text-gray-600 text-lg">Sign in to your account</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
             <p className="text-red-600 text-sm">{error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
               Username
             </label>
             <input
@@ -53,13 +58,13 @@ const Login: React.FC = () => {
               required
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               placeholder="Enter your username"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
               Password
             </label>
             <input
@@ -68,7 +73,7 @@ const Login: React.FC = () => {
               required
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               placeholder="Enter your password"
             />
           </div>
@@ -76,7 +81,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
@@ -85,15 +90,15 @@ const Login: React.FC = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
-            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link to="/register" className="text-purple-600 hover:text-purple-700 font-semibold">
               Sign up
             </Link>
           </p>
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-800 font-medium">Demo Account:</p>
-          <p className="text-xs text-blue-600 mt-1">Username: demo | Password: demo123</p>
+        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl">
+          <p className="text-sm text-blue-800 font-semibold">Demo Account:</p>
+          <p className="text-xs text-blue-600 mt-1 font-medium">Username: demo | Password: demo123</p>
         </div>
       </div>
     </div>
