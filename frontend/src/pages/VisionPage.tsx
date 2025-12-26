@@ -10,7 +10,7 @@ const VisionPage: React.FC = () => {
     const fetchVisions = async () => {
       try {
         const response = await visionAPI.getAll();
-        setVisions(response.data);
+        setVisions(response.data.results || []);
       } catch (error) {
         console.error('Error fetching visions:', error);
       } finally {

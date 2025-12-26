@@ -10,7 +10,7 @@ const ReflectionsPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await reflectionsAPI.getAll();
-        setReflections(response.data);
+        setReflections(response.data.results || []);
       } catch (error) {
         console.error('Error fetching reflections:', error);
       } finally {

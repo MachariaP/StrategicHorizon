@@ -19,10 +19,10 @@ const Dashboard: React.FC = () => {
           executionsAPI.getAll(),
         ]);
 
-        setVision(visionRes.data[0] || null);
-        setGoals(goalsRes.data);
-        setKPIs(kpisRes.data);
-        setExecutions(executionsRes.data);
+        setVision(visionRes.data.results?.[0] || null);
+        setGoals(goalsRes.data.results || []);
+        setKPIs(kpisRes.data.results || []);
+        setExecutions(executionsRes.data.results || []);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {

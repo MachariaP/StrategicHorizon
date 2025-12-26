@@ -10,7 +10,7 @@ const KPIsPage: React.FC = () => {
     const fetchKPIs = async () => {
       try {
         const response = await kpisAPI.getAll();
-        setKPIs(response.data);
+        setKPIs(response.data.results || []);
       } catch (error) {
         console.error('Error fetching KPIs:', error);
       } finally {

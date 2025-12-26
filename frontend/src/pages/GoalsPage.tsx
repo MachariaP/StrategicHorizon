@@ -10,7 +10,7 @@ const GoalsPage: React.FC = () => {
     const fetchGoals = async () => {
       try {
         const response = await goalsAPI.getAll();
-        setGoals(response.data);
+        setGoals(response.data.results || []);
       } catch (error) {
         console.error('Error fetching goals:', error);
       } finally {

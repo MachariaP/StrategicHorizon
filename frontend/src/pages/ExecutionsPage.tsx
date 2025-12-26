@@ -10,7 +10,7 @@ const ExecutionsPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await executionsAPI.getAll();
-        setExecutions(response.data);
+        setExecutions(response.data.results || []);
       } catch (error) {
         console.error('Error fetching executions:', error);
       } finally {

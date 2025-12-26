@@ -10,7 +10,7 @@ const NonNegotiablesPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await nonNegotiablesAPI.getAll();
-        setItems(response.data);
+        setItems(response.data.results || []);
       } catch (error) {
         console.error('Error fetching non-negotiables:', error);
       } finally {

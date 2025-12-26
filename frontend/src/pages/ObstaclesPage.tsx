@@ -10,7 +10,7 @@ const ObstaclesPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await obstaclesAPI.getAll();
-        setObstacles(response.data);
+        setObstacles(response.data.results || []);
       } catch (error) {
         console.error('Error fetching obstacles:', error);
       } finally {

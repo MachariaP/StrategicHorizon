@@ -10,7 +10,7 @@ const SystemsPage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await systemsAPI.getAll();
-        setSystems(response.data);
+        setSystems(response.data.results || []);
       } catch (error) {
         console.error('Error fetching systems:', error);
       } finally {

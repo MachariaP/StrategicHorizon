@@ -121,3 +121,10 @@ export interface RegisterData {
   first_name?: string;
   last_name?: string;
 }
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}

@@ -10,7 +10,7 @@ const PeoplePage: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await peopleAPI.getAll();
-        setPeople(response.data);
+        setPeople(response.data.results || []);
       } catch (error) {
         console.error('Error fetching people:', error);
       } finally {
