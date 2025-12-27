@@ -2,6 +2,9 @@ from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from .models import Vision
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(pre_save, sender=Vision)
@@ -18,8 +21,6 @@ def track_vision_deletion(sender, instance, **kwargs):
                     pass
         except Exception as e:
             # Handle database errors gracefully (e.g., during migrations or schema mismatches)
-            import logging
-            logger = logging.getLogger(__name__)
             logger.debug(f"Error in track_vision_deletion signal: {e}")
 
 
@@ -30,8 +31,6 @@ def create_archive_log(sender, instance, created, **kwargs):
         # Log the archive event
         # In a production environment, you could create an ArchiveLog model
         # For now, we'll just log it
-        import logging
-        logger = logging.getLogger(__name__)
         logger.info(
             f"Vision archived - User: {instance.user.username}, "
             f"Year: {instance.year}, Theme: {instance.yearly_theme}, "

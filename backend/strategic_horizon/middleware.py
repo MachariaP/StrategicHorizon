@@ -65,10 +65,19 @@ class AuditLogMiddleware(MiddlewareMixin):
             try:
                 # Use request.data if available (set by DRF) to avoid RawPostDataException
                 if hasattr(request, 'data') and request.data:
-                    # request.data is already parsed by DRF
-                    body = dict(request.data) if hasattr(request.data, 'items') else request.data
+                    # request.data is already parsed by DRF - handle various data structures
+                    if hasattr(request.data, 'items'):
+                        # QueryDict or dict-like object
+                        body = dict(request.data.items())
+                    elif isinstance(request.data, (list, dict)):
+                        # Already a native Python type
+                        body = request.data
+                    else:
+                        # Other types - convert to string representation
+                        body = str(request.data)
                     # Sanitize sensitive fields
-                    body = self._sanitize_sensitive_data(body)
+                    if isinstance(body, dict):
+                        body = self._sanitize_sensitive_data(body)
                     audit_data['request_body'] = body
             except (json.JSONDecodeError, UnicodeDecodeError, AttributeError):
                 audit_data['request_body'] = 'Unable to parse'
