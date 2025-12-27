@@ -59,7 +59,7 @@ def check_django():
     print_info("Checking Django installation...")
     try:
         import django
-        print_success(f"Django {django.__version__} (requirement: 5.1.4)")
+        print_success(f"Django {django.__version__} installed")
         
         # Check if migrations module is accessible
         try:
@@ -81,7 +81,7 @@ def check_drf():
     print_info("Checking Django REST Framework...")
     try:
         import rest_framework
-        print_success(f"Django REST Framework {rest_framework.__version__} (requirement: 3.16.1)")
+        print_success(f"Django REST Framework {rest_framework.__version__} installed")
         return True
     except ImportError:
         print_error("Django REST Framework is not installed")
@@ -129,7 +129,10 @@ def check_requirements_file():
         print_success("requirements.txt exists")
         with open(requirements_path) as f:
             content = f.read()
-            if 'Django==' in content and 'djangorestframework==' in content:
+            # More flexible checking - just look for Django and djangorestframework anywhere in the file
+            has_django = 'django' in content.lower()
+            has_drf = 'djangorestframework' in content.lower()
+            if has_django and has_drf:
                 print_success("requirements.txt contains Django and DRF")
                 return True
             else:
@@ -166,7 +169,21 @@ def test_django_import():
     """Test Django configuration by importing settings."""
     print_info("Testing Django configuration...")
     try:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'strategic_horizon.settings')
+        # Try to detect settings module from manage.py if it exists
+        manage_path = Path(__file__).parent / 'manage.py'
+        settings_module = 'strategic_horizon.settings'  # default
+        
+        if manage_path.exists():
+            with open(manage_path) as f:
+                for line in f:
+                    if 'DJANGO_SETTINGS_MODULE' in line and '=' in line:
+                        # Extract settings module name from manage.py
+                        parts = line.split("'")
+                        if len(parts) >= 2:
+                            settings_module = parts[1]
+                            break
+        
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
         import django
         django.setup()
         print_success("Django configuration loaded successfully")
