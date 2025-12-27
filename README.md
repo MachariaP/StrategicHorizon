@@ -116,6 +116,10 @@ StrategicHorizon/
 
 ## 🚀 Getting Started
 
+> 📖 **New to the project?** Check out our [Quick Start Guide](./QUICK_START.md) for a streamlined setup experience!
+> 
+> ⚠️ **Experiencing issues?** See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for common problems and solutions.
+
 ### Prerequisites
 
 - Python 3.12+
@@ -159,8 +163,14 @@ cd backend
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
+# Upgrade pip (recommended)
+pip install --upgrade pip
+
 # Install dependencies
 pip install -r requirements.txt
+
+# Verify setup (optional but recommended)
+python verify_setup.py
 
 # The .env file should already exist with database configuration
 # If not, create it with:
@@ -179,6 +189,10 @@ python manage.py seed_data
 # Start the development server
 python manage.py runserver
 ```
+
+**⚠️ Important:** Always ensure your virtual environment is activated before running any Python commands. You should see `(venv)` in your terminal prompt.
+
+**Having issues?** See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for common problems and solutions.
 
 The backend will be available at http://localhost:8000
 
