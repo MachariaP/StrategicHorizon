@@ -20,8 +20,10 @@ class VisionViewSet(viewsets.ModelViewSet):
     throttle_classes = [VisionThrottle]
 
     def get_queryset(self) -> Any:
-        """Return only non-deleted visions for the current user"""
-        return Vision.objects.filter(user=self.request.user)
+        """Return only non-deleted visions for the current user with optimized queries"""
+        return Vision.objects.filter(
+            user=self.request.user
+        ).prefetch_related('goals')
     
     @action(detail=True, methods=['patch'], url_path='soft-delete')
     def soft_delete(self, request: Any, pk: Any = None) -> Response:

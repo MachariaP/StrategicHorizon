@@ -1,24 +1,30 @@
 from rest_framework import serializers
 from .models import KPI
+from typing import Dict, Any
 
 
 class KPISerializer(serializers.ModelSerializer):
     """Serializer for KPI model with validation rules."""
     progress_percentage = serializers.ReadOnlyField()
     actual_value = serializers.ReadOnlyField()  # Computed from current_value
+    goal_title = serializers.CharField(source='goal.title', read_only=True)
+    goal_status = serializers.CharField(source='goal.status', read_only=True)
 
     class Meta:
         model = KPI
         fields = [
-            'id', 'goal', 'name', 'description', 
+            'id', 'goal', 'goal_title', 'goal_status', 'name', 'description', 
             'current_value', 'target_value', 'actual_value', 
             'unit', 'trend_data', 'progress_percentage', 
             'is_deleted', 'deleted_at',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'progress_percentage', 'actual_value', 'created_at', 'updated_at', 'is_deleted', 'deleted_at']
+        read_only_fields = [
+            'id', 'progress_percentage', 'actual_value', 'goal_title', 
+            'goal_status', 'created_at', 'updated_at', 'is_deleted', 'deleted_at'
+        ]
 
-    def validate(self, data):
+    def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Ensure target_value is greater than 0 and makes sense with current_value.
         """
@@ -42,7 +48,7 @@ class KPISerializer(serializers.ModelSerializer):
         
         return data
     
-    def validate_goal(self, value):
+    def validate_goal(self, value: Any) -> Any:
         """Ensure the goal belongs to the current user."""
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
@@ -52,6 +58,6 @@ class KPISerializer(serializers.ModelSerializer):
                 )
         return value
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, Any]) -> KPI:
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
