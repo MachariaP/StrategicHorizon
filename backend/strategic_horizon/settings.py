@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     # Local apps
+    'core',  # Core models and utilities
     'auth_app',
     'vision',
     'goals',
@@ -166,8 +167,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
+    'DEFAULT_PAGINATION_CLASS': 'core.pagination.StandardLimitOffsetPagination',
+    'PAGE_SIZE': 20,
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
@@ -176,6 +177,8 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '1000/hour',
         'auth': '5/minute',  # For sensitive auth endpoints
+        'vision': '100/hour',  # For Vision endpoints
+        'goals': '200/hour',  # For Goals endpoints
     }
 }
 

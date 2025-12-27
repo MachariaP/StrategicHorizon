@@ -2,9 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from vision.models import Vision
+from core.models import BaseModel
+from typing import Optional
 
 
-class Goal(models.Model):
+class Goal(BaseModel):
     """Specific, measurable milestones with status tracking and confidence levels"""
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -24,30 +26,43 @@ class Goal(models.Model):
         help_text="Confidence level from 1 (low) to 5 (high)"
     )
     target_date = models.DateField(null=True, blank=True)
-    
-    # Soft delete fields
-    is_deleted = models.BooleanField(default=False, help_text="Soft delete flag")
-    deleted_at = models.DateTimeField(null=True, blank=True, help_text="Deletion timestamp")
-    
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['target_date', '-created_at']
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.user.username} - {self.title}"
     
-    @property
-    def progress_percentage(self) -> float:
+    def get_progress_percentage(self) -> float:
         """
         Calculate progress based on linked KPIs.
-        Returns average progress of all linked KPIs.
+        
+        Returns:
+            Average progress of all linked KPIs as a percentage (0-100)
         """
-        kpis = self.kpis.all()
+        kpis = self.kpis.filter(is_deleted=False)
         if not kpis.exists():
             return 0.0
         
         total_progress = sum(kpi.progress_percentage for kpi in kpis)
         return round(total_progress / kpis.count(), 2)
+    
+    @property
+    def progress_percentage(self) -> float:
+        """
+        Property wrapper for get_progress_percentage for backward compatibility.
+        
+        Returns:
+            Average progress of all linked KPIs as a percentage (0-100)
+        """
+        return self.get_progress_percentage()
+    
+    def get_kpi_count(self) -> int:
+        """
+        Get the count of active KPIs linked to this goal.
+        
+        Returns:
+            Number of non-deleted KPIs associated with this goal
+        """
+        return self.kpis.filter(is_deleted=False).count()
 

@@ -14,7 +14,8 @@ logger = logging.getLogger('strategic_horizon.audit')
 class AuditLogMiddleware(MiddlewareMixin):
     """
     Custom Audit Log Middleware that captures every POST/PATCH action
-    to track strategic shifts and changes.
+    to track strategic shifts and changes, with special emphasis on
+    Vision and Goals endpoints.
     """
     
     def process_request(self, request):
@@ -38,6 +39,9 @@ class AuditLogMiddleware(MiddlewareMixin):
         else:
             response_time = 0
         
+        # Check if this is a strategic shift (Vision or Goals change)
+        is_strategic_shift = self._is_strategic_shift(request.path)
+        
         # Prepare audit log entry
         audit_data = {
             'timestamp': timezone.now().isoformat(),
@@ -49,7 +53,12 @@ class AuditLogMiddleware(MiddlewareMixin):
             'response_time': response_time,
             'ip_address': self._get_client_ip(request),
             'user_agent': request.META.get('HTTP_USER_AGENT', '')[:255],
+            'is_strategic_shift': is_strategic_shift,
         }
+        
+        # Add special flag for strategic shifts
+        if is_strategic_shift:
+            audit_data['shift_type'] = self._get_shift_type(request.path)
         
         # Try to capture request body for POST/PATCH (but sanitize passwords)
         if request.method in ['POST', 'PATCH']:
@@ -62,10 +71,40 @@ class AuditLogMiddleware(MiddlewareMixin):
             except (json.JSONDecodeError, UnicodeDecodeError):
                 audit_data['request_body'] = 'Unable to parse'
         
-        # Log the audit entry
-        logger.info(f"AUDIT: {json.dumps(audit_data)}")
+        # Log with special prefix for strategic shifts
+        log_prefix = "STRATEGIC_SHIFT" if is_strategic_shift else "AUDIT"
+        logger.info(f"{log_prefix}: {json.dumps(audit_data)}")
         
         return response
+    
+    def _is_strategic_shift(self, path: str) -> bool:
+        """
+        Determine if the request is a strategic shift (Vision or Goals change).
+        
+        Args:
+            path: Request path
+            
+        Returns:
+            True if path relates to Vision or Goals
+        """
+        strategic_paths = ['/api/vision/', '/api/goals/']
+        return any(path.startswith(sp) for sp in strategic_paths)
+    
+    def _get_shift_type(self, path: str) -> str:
+        """
+        Get the type of strategic shift from the path.
+        
+        Args:
+            path: Request path
+            
+        Returns:
+            Type of shift (Vision or Goals)
+        """
+        if '/api/vision/' in path:
+            return 'Vision'
+        elif '/api/goals/' in path:
+            return 'Goals'
+        return 'Unknown'
     
     def _get_client_ip(self, request) -> str:
         """Extract client IP address from request."""
