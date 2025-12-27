@@ -9,16 +9,18 @@ def track_vision_deletion(sender, instance, **kwargs):
     """Track when a vision is being soft deleted"""
     if instance.pk:
         try:
-            # Use raw SQL to check if record exists to avoid model field validation issues
+            # Use filter().first() to safely check if record exists without raising exceptions
             old_instance = Vision.all_objects.filter(pk=instance.pk).first()
             if old_instance:
                 # Check if vision is being soft deleted
                 if not old_instance.is_deleted and instance.is_deleted:
                     # This will trigger the post_save signal
                     pass
-        except Exception:
-            # Silently handle any database errors (e.g., during migrations)
-            pass
+        except Exception as e:
+            # Handle database errors gracefully (e.g., during migrations or schema mismatches)
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.debug(f"Error in track_vision_deletion signal: {e}")
 
 
 @receiver(post_save, sender=Vision)
