@@ -572,3 +572,5 @@ docker-compose.dev.yml
 !/.git/config
 !/.git/description
 !/.git/HEAD
+logs/
+*.log
