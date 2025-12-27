@@ -26,10 +26,15 @@ export interface Vision {
 export interface Goal {
   id: number;
   vision?: number;
+  vision_details?: Vision;
   title: string;
   description: string;
-  status: 'pending' | 'in_progress' | 'completed';
+  status: 'pending' | 'in_progress' | 'completed' | 'stalled';
+  confidence_level: number; // 1-5
   target_date?: string;
+  progress_percentage: number;
+  kpi_count: number;
+  strategic_level?: 'high' | 'low'; // Client-side only for UI distinction
   created_at: string;
   updated_at: string;
 }
