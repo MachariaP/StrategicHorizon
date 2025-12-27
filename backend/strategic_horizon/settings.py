@@ -68,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'vision.middleware.VisionPresenceMiddleware',  # Vision Presence tracking
 ]
 
 ROOT_URLCONF = 'strategic_horizon.urls'

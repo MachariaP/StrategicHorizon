@@ -11,6 +11,13 @@ export interface Vision {
   year: number;
   north_star: string;
   yearly_theme: string;
+  time_horizon: 1 | 3 | 5 | 10;
+  time_horizon_display: string;
+  five_whys: string[];
+  is_active: boolean;
+  is_deleted: boolean;
+  deleted_at?: string;
+  visual_url?: string;
   created_at: string;
   updated_at: string;
 }

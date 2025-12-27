@@ -50,7 +50,11 @@ export const visionAPI = {
   getOne: (id: number) => api.get<Vision>(`/api/vision/${id}/`),
   create: (data: Partial<Vision>) => api.post<Vision>('/api/vision/', data),
   update: (id: number, data: Partial<Vision>) => api.put<Vision>(`/api/vision/${id}/`, data),
+  patch: (id: number, data: Partial<Vision>) => api.patch<Vision>(`/api/vision/${id}/`, data),
   delete: (id: number) => api.delete(`/api/vision/${id}/`),
+  softDelete: (id: number) => api.patch(`/api/vision/${id}/soft-delete/`),
+  restore: (id: number) => api.patch(`/api/vision/${id}/restore/`),
+  getArchived: () => api.get<Vision[]>('/api/vision/archived/'),
 };
 
 // Goals API
