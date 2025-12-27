@@ -93,6 +93,7 @@ export function useCreateKPI() {
         const optimisticKPI: KPI = {
           id: Math.random() * 1000000, // Temporary ID (will be replaced by server response)
           ...newKPI,
+          description: newKPI.description || '',
           progress_percentage: newKPI.target_value > 0 
             ? Math.min((newKPI.current_value / newKPI.target_value) * 100, 100) 
             : 0,

@@ -89,6 +89,8 @@ export function useCreatePerson() {
         const optimisticPerson: Person = {
           id: Math.random() * 1000000,
           ...newPerson,
+          contact_info: newPerson.contact_info || '',
+          notes: newPerson.notes || '',
           relationship_depth: newPerson.relationship_depth || 2,
           frequency_days: newPerson.frequency_days || 30,
           created_at: new Date().toISOString(),

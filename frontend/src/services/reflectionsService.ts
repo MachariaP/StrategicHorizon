@@ -6,7 +6,7 @@ import axios from 'axios';
 export interface CreateReflectionData {
   reflection_type: 'weekly' | 'monthly' | 'quarterly';
   year: number;
-  quarter?: number;
+  quarter?: 1 | 2 | 3 | 4;
   month?: number;
   week_number?: number;
   wins: string;
