@@ -83,6 +83,12 @@
     animation: scale-in 0.3s ease-out;
   }
 
+  .typewriter {
+    overflow: hidden;
+    white-space: pre-wrap;
+    animation: typewriter 2s steps(40, end);
+  }
+
   .backdrop-blur-xs {
     backdrop-filter: blur(2px);
   }
@@ -210,5 +216,14 @@
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes typewriter {
+  from {
+    max-height: 0;
+  }
+  to {
+    max-height: 10em;
   }
 }

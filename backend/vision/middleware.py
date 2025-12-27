@@ -13,7 +13,7 @@ class VisionPresenceMiddleware:
     
     def __init__(self, get_response):
         self.get_response = get_response
-        self.vision_paths = ['/api/vision/', '/api/visions/']  # Vision-related paths
+        self.vision_paths = ['/api/vision/']  # Vision-related paths
         self.reminder_threshold_days = 7
     
     def __call__(self, request):

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 from .managers import VisionManager
 
 
@@ -50,7 +51,6 @@ class Vision(models.Model):
     
     def soft_delete(self):
         """Perform soft delete"""
-        from django.utils import timezone
         self.is_deleted = True
         self.deleted_at = timezone.now()
         self.save()

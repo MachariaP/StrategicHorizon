@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Vision } from '../../types';
+import { visionAPI } from '../../api';
 
 interface VaultProps {
   isOpen: boolean;
@@ -21,16 +22,8 @@ const Vault: React.FC<VaultProps> = ({ isOpen, onClose, onRestore }) => {
   const fetchArchivedVisions = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/vision/archived/', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setArchivedVisions(data);
-      }
+      const response = await visionAPI.getArchived();
+      setArchivedVisions(response.data);
     } catch (error) {
       console.error('Error fetching archived visions:', error);
     } finally {

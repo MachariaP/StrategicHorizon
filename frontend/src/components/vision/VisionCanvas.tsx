@@ -1,6 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
+// Configuration for starfield density based on time horizon
+const STAR_COUNTS = {
+  1: 15,   // Near term - fewer stars, more technical
+  3: 20,   // Mid term - moderate star density
+  5: 30,   // Long term - more abstract
+  10: 50,  // Far future - maximum stars, very abstract
+} as const;
+
 interface VisionCanvasProps {
   children: React.ReactNode;
   timeHorizon: 1 | 3 | 5 | 10;
@@ -37,7 +45,7 @@ const VisionCanvas: React.FC<VisionCanvasProps> = ({ children, timeHorizon }) =>
       {/* Starfield background effect */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Subtle animated stars */}
-        {[...Array(timeHorizon === 10 ? 50 : timeHorizon === 5 ? 30 : 15)].map((_, i) => (
+        {[...Array(STAR_COUNTS[timeHorizon])].map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-white rounded-full"
