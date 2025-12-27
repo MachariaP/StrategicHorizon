@@ -25,6 +25,11 @@ class Execution(models.Model):
     month = models.IntegerField(choices=MONTH_CHOICES)
     year = models.IntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='planned')
+    
+    # Soft delete fields
+    is_deleted = models.BooleanField(default=False, help_text="Soft delete flag")
+    deleted_at = models.DateTimeField(null=True, blank=True, help_text="Deletion timestamp")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
