@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class NonNegotiable(models.Model):
-    """Daily/weekly boundaries or rules"""
+    """Daily/weekly boundaries or rules that are binary (Yes/No)"""
     FREQUENCY_CHOICES = [
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),
@@ -14,6 +14,15 @@ class NonNegotiable(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     frequency = models.CharField(max_length=20, choices=FREQUENCY_CHOICES, default='daily')
+    is_binary = models.BooleanField(
+        default=True,
+        help_text="Non-negotiables are binary by nature (Yes/No)"
+    )
+    
+    # Soft delete fields
+    is_deleted = models.BooleanField(default=False, help_text="Soft delete flag")
+    deleted_at = models.DateTimeField(null=True, blank=True, help_text="Deletion timestamp")
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
