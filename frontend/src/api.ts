@@ -63,6 +63,7 @@ export const goalsAPI = {
   getOne: (id: number) => api.get<Goal>(`/api/goals/${id}/`),
   create: (data: Partial<Goal>) => api.post<Goal>('/api/goals/', data),
   update: (id: number, data: Partial<Goal>) => api.put<Goal>(`/api/goals/${id}/`, data),
+  patch: (id: number, data: Partial<Goal>) => api.patch<Goal>(`/api/goals/${id}/`, data),
   delete: (id: number) => api.delete(`/api/goals/${id}/`),
 };
 
