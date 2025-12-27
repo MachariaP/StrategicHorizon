@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { motion } from 'framer-motion';
+import TextareaAutosize from 'react-textarea-autosize';
 import { useVisions, useCreateVision, useUpdateVision } from '../services/visionService';
 import { useToast } from '../hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
-import { Textarea } from '../components/ui/textarea';
 import { Skeleton } from '../components/ui/skeleton';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../components/ui/sheet';
+import { Maximize2, Minimize2, History, Target, TrendingUp } from 'lucide-react';
 
 // Zod validation schema - minimum 50 characters for vision statement
 const visionSchema = z.object({
@@ -17,12 +21,15 @@ const visionSchema = z.object({
   yearly_theme: z.string()
     .min(3, 'Theme must be at least 3 characters')
     .max(200, 'Theme cannot exceed 200 characters'),
+  five_whys: z.array(z.string()).optional(),
 });
 
 type VisionFormData = z.infer<typeof visionSchema>;
 
 const VisionPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [manifestoMode, setManifestoMode] = useState(false);
+  const [fiveWhysEdit, setFiveWhysEdit] = useState<string[]>(['', '', '', '', '']);
   const { toast } = useToast();
 
   // TanStack Query hooks
@@ -54,12 +61,21 @@ const VisionPage: React.FC = () => {
         north_star: currentVision.north_star,
         yearly_theme: currentVision.yearly_theme,
       });
+      // Initialize five whys
+      if (currentVision.five_whys && currentVision.five_whys.length > 0) {
+        const whys = [...currentVision.five_whys];
+        while (whys.length < 5) whys.push('');
+        setFiveWhysEdit(whys.slice(0, 5));
+      }
     }
   }, [currentVision, reset]);
 
   // Handle form submission
   const onSubmit = async (data: VisionFormData) => {
     try {
+      // Filter out empty five whys
+      const filteredWhys = fiveWhysEdit.filter(why => why.trim().length > 0);
+      
       if (currentVision) {
         // Update existing vision
         await updateVision.mutateAsync({
@@ -67,6 +83,7 @@ const VisionPage: React.FC = () => {
           data: {
             north_star: data.north_star,
             yearly_theme: data.yearly_theme,
+            five_whys: filteredWhys,
           },
         });
         toast({
@@ -81,6 +98,7 @@ const VisionPage: React.FC = () => {
           north_star: data.north_star,
           yearly_theme: data.yearly_theme,
           time_horizon: 1,
+          five_whys: filteredWhys,
         });
         toast({
           title: "Vision Created Successfully",
@@ -180,57 +198,251 @@ const VisionPage: React.FC = () => {
     );
   }
 
-  // View Mode - Display vision
+  // View Mode - Display vision with all enhancements
   if (currentVision && !isEditing) {
+    // Manifesto Mode - Fullscreen presentation
+    if (manifestoMode) {
+      return (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-pink-900 animate-gradient-xy"
+        >
+          <Button
+            onClick={() => setManifestoMode(false)}
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 text-white hover:bg-white/20"
+          >
+            <Minimize2 className="h-6 w-6" />
+          </Button>
+          <div className="max-w-5xl mx-auto px-8 text-center space-y-12">
+            <motion.h1
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-6xl md:text-8xl font-bold text-white mb-8"
+              style={{ fontFamily: 'Georgia, serif' }}
+            >
+              {currentVision.yearly_theme}
+            </motion.h1>
+            <motion.blockquote
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-3xl md:text-5xl leading-relaxed text-white/90 italic"
+              style={{ fontFamily: 'Georgia, serif' }}
+            >
+              "{currentVision.north_star}"
+            </motion.blockquote>
+            <motion.p
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="text-xl text-white/70"
+            >
+              Year {currentVision.year}
+            </motion.p>
+          </div>
+        </motion.div>
+      );
+    }
+
     return (
       <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <h1 className="text-4xl font-bold text-slate-900">Vision</h1>
-            <Button onClick={() => setIsEditing(true)} variant="outline">
-              Edit Vision
-            </Button>
+            <div className="flex gap-2">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <History className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Vision History</SheetTitle>
+                    <SheetDescription>
+                      Your evolution over the years
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="mt-6 space-y-4">
+                    {visions.length > 1 ? (
+                      visions.slice(1).map((vision) => (
+                        <Card key={vision.id} className="border-slate-200">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="text-lg">{vision.yearly_theme}</CardTitle>
+                            <CardDescription>Year {vision.year}</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm text-slate-600 italic line-clamp-3">
+                              "{vision.north_star}"
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ))
+                    ) : (
+                      <p className="text-sm text-slate-500 text-center py-8">
+                        No previous visions yet. Your journey starts here.
+                      </p>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+              <Button onClick={() => setManifestoMode(true)} variant="outline" size="icon">
+                <Maximize2 className="h-4 w-4" />
+              </Button>
+              <Button onClick={() => setIsEditing(true)} variant="outline">
+                Edit Vision
+              </Button>
+            </div>
           </div>
 
-          <Card className="overflow-hidden border-2 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl" style={{ fontFamily: 'Georgia, serif' }}>
-                    {currentVision.yearly_theme}
-                  </CardTitle>
-                  <CardDescription className="text-sm mt-2">
-                    Year {currentVision.year}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className="overflow-hidden border-2 shadow-lg relative">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-5 pointer-events-none">
+                <svg width="100%" height="100%">
+                  <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                      <circle cx="20" cy="20" r="1" fill="currentColor" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#grid)" />
+                </svg>
+              </div>
+              
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b relative">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl" style={{ fontFamily: 'Georgia, serif' }}>
+                      {currentVision.yearly_theme}
+                    </CardTitle>
+                    <CardDescription className="text-sm mt-2">
+                      Year {currentVision.year}
+                    </CardDescription>
+                  </div>
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl">
+                    🎯
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-8 relative">
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+                    North Star Statement
+                  </h3>
+                  <blockquote
+                    className="text-2xl leading-relaxed text-slate-800 italic border-l-4 border-purple-500 pl-6"
+                    style={{ fontFamily: 'Georgia, serif' }}
+                  >
+                    "{currentVision.north_star}"
+                  </blockquote>
+                  <div className="pt-4 text-sm text-slate-500">
+                    Last updated: {new Date(currentVision.updated_at).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Goal Progress Alignment Meter */}
+          {currentVision.goal_count !== undefined && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <Card className="border-2">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center gap-2">
+                    <Target className="h-5 w-5 text-purple-600" />
+                    <CardTitle className="text-lg">Current Alignment</CardTitle>
+                  </div>
+                  <CardDescription>
+                    Goals connected to this vision
                   </CardDescription>
-                </div>
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl">
-                  🎯
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-                  North Star Statement
-                </h3>
-                <blockquote
-                  className="text-2xl leading-relaxed text-slate-800 italic border-l-4 border-purple-500 pl-6"
-                  style={{ fontFamily: 'Georgia, serif' }}
-                >
-                  "{currentVision.north_star}"
-                </blockquote>
-                <div className="pt-4 text-sm text-slate-500">
-                  Last updated: {new Date(currentVision.updated_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-2 mb-2">
+                        <span className="text-3xl font-bold text-purple-600">
+                          {currentVision.goal_count}
+                        </span>
+                        <span className="text-lg text-slate-600">
+                          {currentVision.goal_count === 1 ? 'Goal' : 'Goals'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-500">
+                        {currentVision.goal_count === 0 
+                          ? 'No goals linked yet. Create goals to fulfill this vision.'
+                          : currentVision.goal_count === 1
+                          ? '1 goal is actively working toward this North Star.'
+                          : `${currentVision.goal_count} goals are actively working toward this North Star.`}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-pink-100">
+                      <TrendingUp className="h-8 w-8 text-purple-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* 5-Whys Deep Dive Section */}
+          {currentVision.five_whys && currentVision.five_whys.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <Card className="border-2">
+                <CardContent className="pt-6">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="purpose" className="border-none">
+                      <AccordionTrigger className="text-lg font-semibold">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl">🎯</span>
+                          <span>Deep Purpose - The 5 Whys</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-4 pt-4">
+                          <p className="text-sm text-slate-600 mb-6">
+                            Understanding the core motivation behind your vision helps prevent drift during challenging times.
+                          </p>
+                          {currentVision.five_whys.map((why, index) => (
+                            <div key={index} className="flex gap-4 items-start">
+                              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-sm">
+                                {index + 1}
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-slate-700 leading-relaxed">{why}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
         </div>
       </div>
     );
@@ -288,11 +500,11 @@ const VisionPage: React.FC = () => {
                 <label htmlFor="north_star" className="text-sm font-medium text-slate-700">
                   North Star Statement
                 </label>
-                <Textarea
+                <TextareaAutosize
                   id="north_star"
                   placeholder="Write your vision statement here (minimum 50 characters)..."
-                  autoResize
-                  className="min-h-[120px] text-base"
+                  minRows={4}
+                  className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-base ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                   {...register('north_star')}
                 />
                 {errors.north_star && (
@@ -301,6 +513,40 @@ const VisionPage: React.FC = () => {
                 <p className="text-xs text-slate-500">
                   Minimum 50 characters required for thoughtful reflection
                 </p>
+              </div>
+
+              {/* 5-Whys Deep Purpose Section */}
+              <div className="space-y-4 pt-4 border-t">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                    Deep Purpose - The 5 Whys (Optional)
+                  </h3>
+                  <p className="text-sm text-slate-600">
+                    Document the layers of "why" behind your vision to prevent drift during challenging times.
+                  </p>
+                </div>
+                {[0, 1, 2, 3, 4].map((index) => (
+                  <div key={index} className="space-y-2">
+                    <label htmlFor={`why-${index}`} className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-xs">
+                        {index + 1}
+                      </span>
+                      Why #{index + 1}
+                    </label>
+                    <TextareaAutosize
+                      id={`why-${index}`}
+                      placeholder={`Why is this important? ${index === 0 ? '(Start with the surface reason)' : ''}`}
+                      minRows={2}
+                      value={fiveWhysEdit[index]}
+                      onChange={(e) => {
+                        const newWhys = [...fiveWhysEdit];
+                        newWhys[index] = e.target.value;
+                        setFiveWhysEdit(newWhys);
+                      }}
+                      className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                    />
+                  </div>
+                ))}
               </div>
 
               {/* Submit Button */}
