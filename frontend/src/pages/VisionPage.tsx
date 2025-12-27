@@ -13,6 +13,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../components/ui/sheet';
 import { Maximize2, Minimize2, History, Target, TrendingUp } from 'lucide-react';
 
+// Constants
+const FIVE_WHYS_COUNT = 5;
+const VISION_FONT_FAMILY = 'Georgia, serif';
+const TEXTAREA_BASE_CLASSES = 'flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none';
+
 // Zod validation schema - minimum 50 characters for vision statement
 const visionSchema = z.object({
   north_star: z.string()
@@ -29,7 +34,7 @@ type VisionFormData = z.infer<typeof visionSchema>;
 const VisionPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [manifestoMode, setManifestoMode] = useState(false);
-  const [fiveWhysEdit, setFiveWhysEdit] = useState<string[]>(['', '', '', '', '']);
+  const [fiveWhysEdit, setFiveWhysEdit] = useState<string[]>(Array(FIVE_WHYS_COUNT).fill(''));
   const { toast } = useToast();
 
   // TanStack Query hooks
@@ -64,8 +69,8 @@ const VisionPage: React.FC = () => {
       // Initialize five whys
       if (currentVision.five_whys && currentVision.five_whys.length > 0) {
         const whys = [...currentVision.five_whys];
-        while (whys.length < 5) whys.push('');
-        setFiveWhysEdit(whys.slice(0, 5));
+        while (whys.length < FIVE_WHYS_COUNT) whys.push('');
+        setFiveWhysEdit(whys.slice(0, FIVE_WHYS_COUNT));
       }
     }
   }, [currentVision, reset]);
@@ -223,7 +228,7 @@ const VisionPage: React.FC = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
               className="text-6xl md:text-8xl font-bold text-white mb-8"
-              style={{ fontFamily: 'Georgia, serif' }}
+              style={{ fontFamily: VISION_FONT_FAMILY }}
             >
               {currentVision.yearly_theme}
             </motion.h1>
@@ -232,7 +237,7 @@ const VisionPage: React.FC = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
               className="text-3xl md:text-5xl leading-relaxed text-white/90 italic"
-              style={{ fontFamily: 'Georgia, serif' }}
+              style={{ fontFamily: VISION_FONT_FAMILY }}
             >
               "{currentVision.north_star}"
             </motion.blockquote>
@@ -321,7 +326,7 @@ const VisionPage: React.FC = () => {
               <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b relative">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-2xl" style={{ fontFamily: 'Georgia, serif' }}>
+                    <CardTitle className="text-2xl" style={{ fontFamily: VISION_FONT_FAMILY }}>
                       {currentVision.yearly_theme}
                     </CardTitle>
                     <CardDescription className="text-sm mt-2">
@@ -340,7 +345,7 @@ const VisionPage: React.FC = () => {
                   </h3>
                   <blockquote
                     className="text-2xl leading-relaxed text-slate-800 italic border-l-4 border-purple-500 pl-6"
-                    style={{ fontFamily: 'Georgia, serif' }}
+                    style={{ fontFamily: VISION_FONT_FAMILY }}
                   >
                     "{currentVision.north_star}"
                   </blockquote>
@@ -504,7 +509,7 @@ const VisionPage: React.FC = () => {
                   id="north_star"
                   placeholder="Write your vision statement here (minimum 50 characters)..."
                   minRows={4}
-                  className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-base ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                  className={`${TEXTAREA_BASE_CLASSES} text-base`}
                   {...register('north_star')}
                 />
                 {errors.north_star && (
@@ -525,7 +530,7 @@ const VisionPage: React.FC = () => {
                     Document the layers of "why" behind your vision to prevent drift during challenging times.
                   </p>
                 </div>
-                {[0, 1, 2, 3, 4].map((index) => (
+                {Array.from({ length: FIVE_WHYS_COUNT }, (_, index) => index).map((index) => (
                   <div key={index} className="space-y-2">
                     <label htmlFor={`why-${index}`} className="text-sm font-medium text-slate-700 flex items-center gap-2">
                       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-semibold text-xs">
@@ -543,7 +548,7 @@ const VisionPage: React.FC = () => {
                         newWhys[index] = e.target.value;
                         setFiveWhysEdit(newWhys);
                       }}
-                      className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      className={`${TEXTAREA_BASE_CLASSES} text-sm focus-visible:ring-purple-500`}
                     />
                   </div>
                 ))}
