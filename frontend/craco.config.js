@@ -1,3 +1,4 @@
+// craco.config.js - Simplified for Tailwind CSS v3
 module.exports = {
   style: {
     postcss: {
@@ -7,4 +8,4 @@ module.exports = {
       ],
     },
   },
-}
+};
