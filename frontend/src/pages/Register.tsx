@@ -45,27 +45,33 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12">
-      <div className="max-w-md w-full bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-purple-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12 relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-float" style={{animationDelay: '1s'}}></div>
+      
+      <div className="max-w-md w-full glass-effect rounded-3xl shadow-2xl p-10 border-2 border-white/50 relative z-10 animate-fade-in-up">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <span className="text-5xl mr-2">🌟</span>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
-              Strategic Horizon
-            </h1>
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-2xl shadow-glow animate-pulse-slow">
+              <span className="text-5xl">🌟</span>
+            </div>
           </div>
-          <p className="text-gray-600 text-lg">Create your account</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text mb-2">
+            Strategic Horizon
+          </h1>
+          <p className="text-gray-600 text-lg font-medium">Create your account</p>
         </div>
 
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl">
-            <p className="text-red-600 text-sm">{error}</p>
+          <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm border-2 border-red-200 rounded-xl animate-slide-down">
+            <p className="text-red-600 text-sm font-medium">⚠️ {error}</p>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label htmlFor="username" className="block text-sm font-bold text-gray-700">
               Username *
             </label>
             <input
@@ -74,12 +80,13 @@ const Register: React.FC = () => {
               required
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-purple-300"
+              placeholder="Choose a username"
             />
           </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label htmlFor="email" className="block text-sm font-bold text-gray-700">
               Email *
             </label>
             <input
@@ -88,13 +95,14 @@ const Register: React.FC = () => {
               required
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-purple-300"
+              placeholder="your.email@example.com"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="first_name" className="block text-sm font-semibold text-gray-700 mb-2">
+            <div className="space-y-2">
+              <label htmlFor="first_name" className="block text-sm font-bold text-gray-700">
                 First Name
               </label>
               <input
@@ -102,12 +110,13 @@ const Register: React.FC = () => {
                 type="text"
                 value={formData.first_name}
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-purple-300"
+                placeholder="First"
               />
             </div>
 
-            <div>
-              <label htmlFor="last_name" className="block text-sm font-semibold text-gray-700 mb-2">
+            <div className="space-y-2">
+              <label htmlFor="last_name" className="block text-sm font-bold text-gray-700">
                 Last Name
               </label>
               <input
@@ -115,13 +124,14 @@ const Register: React.FC = () => {
                 type="text"
                 value={formData.last_name}
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-purple-300"
+                placeholder="Last"
               />
             </div>
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label htmlFor="password" className="block text-sm font-bold text-gray-700">
               Password *
             </label>
             <input
@@ -130,12 +140,13 @@ const Register: React.FC = () => {
               required
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-purple-300"
+              placeholder="Create a strong password"
             />
           </div>
 
-          <div>
-            <label htmlFor="password2" className="block text-sm font-semibold text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label htmlFor="password2" className="block text-sm font-bold text-gray-700">
               Confirm Password *
             </label>
             <input
@@ -144,23 +155,34 @@ const Register: React.FC = () => {
               required
               value={formData.password2}
               onChange={(e) => setFormData({ ...formData, password2: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:border-purple-300"
+              placeholder="Confirm your password"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+            className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-4 rounded-xl hover:from-blue-700 hover:via-purple-700 hover:to-pink-700 transition-all duration-300 disabled:opacity-50 font-bold shadow-xl hover:shadow-2xl transform hover:scale-[1.02] active:scale-95 mt-6"
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Creating Account...
+              </span>
+            ) : (
+              '✨ Create Account'
+            )}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center">
           <p className="text-sm text-gray-600">
             Already have an account?{' '}
-            <Link to="/login" className="text-purple-600 hover:text-purple-700 font-semibold">
+            <Link to="/login" className="text-purple-600 hover:text-purple-700 font-bold hover:underline transition-all">
               Sign in
             </Link>
           </p>
