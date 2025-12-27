@@ -79,11 +79,13 @@ class AuditLogMiddleware(MiddlewareMixin):
                     if isinstance(body, dict):
                         body = self._sanitize_sensitive_data(body)
                     audit_data['request_body'] = body
-            except (json.JSONDecodeError, UnicodeDecodeError, AttributeError):
+            except (json.JSONDecodeError, UnicodeDecodeError, AttributeError, TypeError) as e:
                 audit_data['request_body'] = 'Unable to parse'
-            except Exception:
-                # Silently handle any other exceptions (e.g., RawPostDataException)
+                logger.debug(f"Error parsing request data for audit log: {e}")
+            except Exception as e:
+                # Catch any other exceptions (e.g., from DRF data access)
                 audit_data['request_body'] = 'Not available'
+                logger.debug(f"Unexpected error accessing request data for audit log: {e}")
         
         # Log with special prefix for strategic shifts
         log_prefix = "STRATEGIC_SHIFT" if is_strategic_shift else "AUDIT"

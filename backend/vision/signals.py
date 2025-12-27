@@ -1,6 +1,7 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.db import DatabaseError
 from .models import Vision
 import logging
 
@@ -19,9 +20,12 @@ def track_vision_deletion(sender, instance, **kwargs):
                 if not old_instance.is_deleted and instance.is_deleted:
                     # This will trigger the post_save signal
                     pass
-        except Exception as e:
+        except DatabaseError as e:
             # Handle database errors gracefully (e.g., during migrations or schema mismatches)
-            logger.debug(f"Error in track_vision_deletion signal: {e}")
+            logger.debug(f"Database error in track_vision_deletion signal: {e}")
+        except Exception as e:
+            # Catch any other unexpected errors to prevent signal failures from breaking saves
+            logger.warning(f"Unexpected error in track_vision_deletion signal: {e}")
 
 
 @receiver(post_save, sender=Vision)
