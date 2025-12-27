@@ -201,8 +201,8 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
               Vision <span className="text-red-500">*</span>
             </Label>
             <Select
-              value={selectedVision?.toString()}
-              onValueChange={(value) => setValue('vision', parseInt(value))}
+              value={selectedVision !== undefined ? selectedVision.toString() : undefined}
+              onValueChange={(value) => setValue('vision', parseInt(value), { shouldValidate: true })}
               disabled={visionsLoading}
             >
               <SelectTrigger>
