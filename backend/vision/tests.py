@@ -1,7 +1,10 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from rest_framework.test import APITestCase, APIClient
+from rest_framework import status
 from .models import Vision
 from .serializers import VisionSerializer
+import uuid
 
 
 class VisionModelTest(TestCase):
@@ -23,6 +26,8 @@ class VisionModelTest(TestCase):
         self.assertEqual(self.vision.time_horizon, 5)
         self.assertFalse(self.vision.is_deleted)
         self.assertTrue(self.vision.is_active)
+        # Test UUID is set
+        self.assertIsInstance(self.vision.id, uuid.UUID)
 
     def test_soft_delete(self):
         """Test soft delete functionality"""
@@ -64,6 +69,27 @@ class VisionModelTest(TestCase):
         archived_visions = Vision.objects.archived().filter(user=self.user)
         self.assertEqual(archived_visions.count(), 1)
         self.assertIn(deleted_vision, archived_visions)
+    
+    def test_get_goal_count(self):
+        """Test that get_goal_count returns correct count"""
+        # Import here to avoid circular dependency
+        from goals.models import Goal
+        
+        # Create some goals
+        Goal.objects.create(
+            user=self.user,
+            vision=self.vision,
+            title='Test Goal 1',
+            description='Test description'
+        )
+        Goal.objects.create(
+            user=self.user,
+            vision=self.vision,
+            title='Test Goal 2',
+            description='Test description'
+        )
+        
+        self.assertEqual(self.vision.get_goal_count(), 2)
 
 
 class VisionSerializerTest(TestCase):
@@ -89,8 +115,10 @@ class VisionSerializerTest(TestCase):
             'yearly_theme': 'Test',
             'time_horizon': 1
         })
-        # Note: This will fail without request context, but validates the field logic
-        self.assertTrue('north_star' not in serializer.errors or serializer.is_valid())
+        # Call is_valid first
+        is_valid = serializer.is_valid()
+        # Should not have north_star errors
+        self.assertNotIn('north_star', serializer.errors)
 
     def test_five_whys_validation(self):
         """Test that five_whys validation works"""
@@ -116,3 +144,48 @@ class VisionSerializerTest(TestCase):
         })
         self.assertFalse(serializer.is_valid())
         self.assertIn('five_whys', serializer.errors)
+
+
+class VisionPermissionTest(APITestCase):
+    """Test IsOwner permission on Vision endpoints"""
+    
+    def setUp(self):
+        self.user1 = User.objects.create_user(username='user1', password='testpass')
+        self.user2 = User.objects.create_user(username='user2', password='testpass')
+        
+        self.vision1 = Vision.objects.create(
+            user=self.user1,
+            year=2026,
+            north_star='User 1 vision statement with more than ten words for validation.',
+            yearly_theme='User 1 Theme',
+        )
+        
+        self.vision2 = Vision.objects.create(
+            user=self.user2,
+            year=2026,
+            north_star='User 2 vision statement with more than ten words for validation.',
+            yearly_theme='User 2 Theme',
+        )
+        
+        self.client = APIClient()
+    
+    def test_user_can_access_own_vision(self):
+        """Test that users can access their own visions"""
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get(f'/api/vision/{self.vision1.id}/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_user_cannot_access_others_vision(self):
+        """Test that users cannot access other users' visions"""
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.get(f'/api/vision/{self.vision2.id}/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_user_cannot_modify_others_vision(self):
+        """Test that users cannot modify other users' visions"""
+        self.client.force_authenticate(user=self.user1)
+        response = self.client.patch(
+            f'/api/vision/{self.vision2.id}/',
+            {'yearly_theme': 'Hacked Theme'}
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

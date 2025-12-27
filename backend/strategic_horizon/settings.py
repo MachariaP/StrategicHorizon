@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_beat',
     # Local apps
+    'core',  # Core models and utilities
     'auth_app',
     'vision',
     'goals',
@@ -101,16 +102,29 @@ WSGI_APPLICATION = 'strategic_horizon.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DATABASE_NAME', 'strategic_planner'),
-        'USER': os.getenv('DATABASE_USER', 'postgres'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'postgres'),
-        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
-        'PORT': os.getenv('DATABASE_PORT', '5432'),
+# Use environment variable to determine database engine (default to PostgreSQL for production)
+DATABASE_ENGINE = os.getenv('DATABASE_ENGINE', 'django.db.backends.postgresql')
+
+if DATABASE_ENGINE == 'django.db.backends.sqlite3':
+    # SQLite configuration (for development/testing)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    # PostgreSQL configuration (for production)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DATABASE_NAME', 'strategic_planner'),
+            'USER': os.getenv('DATABASE_USER', 'postgres'),
+            'PASSWORD': os.getenv('DATABASE_PASSWORD', 'postgres'),
+            'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+            'PORT': os.getenv('DATABASE_PORT', '5432'),
+        }
+    }
 
 
 # Password validation
@@ -166,8 +180,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
+    'DEFAULT_PAGINATION_CLASS': 'core.pagination.StandardLimitOffsetPagination',
+    'PAGE_SIZE': 20,
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
@@ -176,6 +190,8 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '1000/hour',
         'auth': '5/minute',  # For sensitive auth endpoints
+        'vision': '100/hour',  # For Vision endpoints
+        'goals': '200/hour',  # For Goals endpoints
     }
 }
 
