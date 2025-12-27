@@ -4,6 +4,7 @@ Provides Audit Log and Timezone functionality.
 """
 import logging
 import json
+from django.http import QueryDict
 from django.utils import timezone
 from django.utils.deprecation import MiddlewareMixin
 from typing import Optional
@@ -63,13 +64,29 @@ class AuditLogMiddleware(MiddlewareMixin):
         # Try to capture request body for POST/PATCH (but sanitize passwords)
         if request.method in ['POST', 'PATCH']:
             try:
-                if hasattr(request, 'body') and request.body:
-                    body = json.loads(request.body.decode('utf-8'))
+                # Use request.data if available (set by DRF) to avoid RawPostDataException
+                if hasattr(request, 'data') and request.data:
+                    # request.data is already parsed by DRF - handle various data structures
+                    if isinstance(request.data, (QueryDict, dict)):
+                        # QueryDict or dict-like object
+                        body = dict(request.data.items()) if isinstance(request.data, QueryDict) else dict(request.data)
+                    elif isinstance(request.data, list):
+                        # List data
+                        body = request.data
+                    else:
+                        # Other types - convert to string representation
+                        body = str(request.data)
                     # Sanitize sensitive fields
-                    body = self._sanitize_sensitive_data(body)
+                    if isinstance(body, dict):
+                        body = self._sanitize_sensitive_data(body)
                     audit_data['request_body'] = body
-            except (json.JSONDecodeError, UnicodeDecodeError):
+            except (UnicodeDecodeError, AttributeError, TypeError) as e:
                 audit_data['request_body'] = 'Unable to parse'
+                logger.debug(f"Error parsing request data for audit log: {str(e)}")
+            except Exception as e:
+                # Catch any other exceptions (e.g., from DRF data access)
+                audit_data['request_body'] = 'Not available'
+                logger.debug(f"Unexpected error accessing request data for audit log: {str(e)}")
         
         # Log with special prefix for strategic shifts
         log_prefix = "STRATEGIC_SHIFT" if is_strategic_shift else "AUDIT"
