@@ -89,7 +89,7 @@ export function useCreateVision() {
       // Optimistically update with temporary ID
       if (previousVisions) {
         const optimisticVision: Vision = {
-          id: Date.now(), // Temporary ID
+          id: Math.random() * 1000000, // Temporary ID (will be replaced by server response)
           ...newVision,
           time_horizon: newVision.time_horizon || 1,
           time_horizon_display: newVision.time_horizon ? `${newVision.time_horizon} Year${newVision.time_horizon > 1 ? 's' : ''}` : '1 Year',

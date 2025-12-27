@@ -23,7 +23,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       adjustHeight()
     }, [props.value, adjustHeight])
 
-    React.useImperativeHandle(ref, () => textareaRef.current!)
+    React.useImperativeHandle(ref, () => textareaRef.current as HTMLTextAreaElement)
 
     return (
       <textarea
