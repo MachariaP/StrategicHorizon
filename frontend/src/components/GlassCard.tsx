@@ -6,13 +6,15 @@ interface GlassCardProps {
   className?: string;
   hoverEffect?: boolean;
   gradient?: boolean;
+  style?: React.CSSProperties;
 }
 
 const GlassCard: React.FC<GlassCardProps> = ({ 
   children, 
   className = '', 
   hoverEffect = true,
-  gradient = false 
+  gradient = false,
+  style
 }) => {
   return (
     <div 
@@ -30,6 +32,7 @@ const GlassCard: React.FC<GlassCardProps> = ({
         ${gradient ? 'before:absolute before:inset-0 before:bg-gradient-to-r before:from-purple-500/10 before:via-pink-500/10 before:to-purple-500/10 before:animate-gradient-x' : ''}
         ${className}
       `}
+      style={style}
     >
       {/* Shimmer effect */}
       <div className="absolute inset-0 bg-gradient-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
