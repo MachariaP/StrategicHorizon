@@ -22,10 +22,10 @@ def track_vision_deletion(sender, instance, **kwargs):
                     pass
         except DatabaseError as e:
             # Handle database errors gracefully (e.g., during migrations or schema mismatches)
-            logger.debug(f"Database error in track_vision_deletion signal: {e}")
+            logger.debug(f"Database error in track_vision_deletion signal: {str(e)}")
         except Exception as e:
             # Catch any other unexpected errors to prevent signal failures from breaking saves
-            logger.warning(f"Unexpected error in track_vision_deletion signal: {e}")
+            logger.warning(f"Unexpected error in track_vision_deletion signal: {str(e)}")
 
 
 @receiver(post_save, sender=Vision)
