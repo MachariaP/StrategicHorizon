@@ -112,7 +112,7 @@ const LandingPage: React.FC = () => {
     };
   }, []);
 
-  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, section: string) => {
+  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, section: string) => {
     e.preventDefault();
     console.log(`Navigating to ${section} section`);
     // Add smooth scroll logic here if needed
