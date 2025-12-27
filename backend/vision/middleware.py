@@ -13,14 +13,13 @@ class VisionPresenceMiddleware:
     
     def __init__(self, get_response):
         self.get_response = get_response
-        self.vision_paths = ['/api/vision/']  # Vision-related paths
         self.reminder_threshold_days = 7
     
     def __call__(self, request):
         # Track vision interaction
         if request.user.is_authenticated:
-            # Check if user is accessing vision endpoints
-            if any(request.path.startswith(path) for path in self.vision_paths):
+            # Check if user is accessing any vision endpoints
+            if request.path.startswith('/api/vision/'):
                 # Update last interaction time
                 cache_key = f'vision_last_interaction_{request.user.id}'
                 cache.set(cache_key, timezone.now(), timeout=None)
