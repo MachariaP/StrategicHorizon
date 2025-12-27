@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from './ui/button';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, Target, ShieldCheck, TrendingUp } from 'lucide-react';
 
 interface ZeroStateProps {
   icon: LucideIcon;
@@ -82,7 +82,7 @@ export function ZeroState({
 export function NoGoalsZeroState({ onCreateGoal }: { onCreateGoal: () => void }) {
   return (
     <ZeroState
-      icon={require('lucide-react').Target}
+      icon={Target}
       title="No Goals Yet"
       description="Start your strategic journey by creating your first goal. Transform your vision into measurable milestones."
       actionLabel="Create Your First Goal"
@@ -95,7 +95,7 @@ export function NoGoalsZeroState({ onCreateGoal }: { onCreateGoal: () => void })
 export function NoObstaclesZeroState({ onAddObstacle }: { onAddObstacle?: () => void }) {
   return (
     <ZeroState
-      icon={require('lucide-react').ShieldCheck}
+      icon={ShieldCheck}
       title="Sailing in Clear Waters!"
       description="No obstacles found. Your path looks clear, but it's always good to anticipate potential challenges."
       actionLabel={onAddObstacle ? "Add Potential Obstacle" : undefined}
@@ -108,7 +108,7 @@ export function NoObstaclesZeroState({ onAddObstacle }: { onAddObstacle?: () => 
 export function NoKPIsZeroState({ onCreateKPI }: { onCreateKPI: () => void }) {
   return (
     <ZeroState
-      icon={require('lucide-react').TrendingUp}
+      icon={TrendingUp}
       title="No KPIs Defined"
       description="Key Performance Indicators help you track progress towards your goals. Start measuring what matters."
       actionLabel="Add Your First KPI"
