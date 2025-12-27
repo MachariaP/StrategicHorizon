@@ -115,8 +115,10 @@ class VisionSerializerTest(TestCase):
             'yearly_theme': 'Test',
             'time_horizon': 1
         })
-        # Note: This will fail without request context, but validates the field logic
-        self.assertTrue('north_star' not in serializer.errors or serializer.is_valid())
+        # Call is_valid first
+        is_valid = serializer.is_valid()
+        # Should not have north_star errors
+        self.assertNotIn('north_star', serializer.errors)
 
     def test_five_whys_validation(self):
         """Test that five_whys validation works"""
