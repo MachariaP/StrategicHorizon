@@ -57,10 +57,7 @@ class AuditLogMiddleware(MiddlewareMixin):
                 if hasattr(request, 'body') and request.body:
                     body = json.loads(request.body.decode('utf-8'))
                     # Sanitize sensitive fields
-                    sensitive_fields = ['password', 'password1', 'password2', 'token', 'secret']
-                    for field in sensitive_fields:
-                        if field in body:
-                            body[field] = '***REDACTED***'
+                    body = self._sanitize_sensitive_data(body)
                     audit_data['request_body'] = body
             except (json.JSONDecodeError, UnicodeDecodeError):
                 audit_data['request_body'] = 'Unable to parse'
@@ -78,6 +75,25 @@ class AuditLogMiddleware(MiddlewareMixin):
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip or 'unknown'
+    
+    def _sanitize_sensitive_data(self, data: dict) -> dict:
+        """
+        Sanitize sensitive fields from request body.
+        Extends beyond passwords to include PII and confidential data.
+        """
+        sensitive_fields = [
+            'password', 'password1', 'password2', 'old_password', 'new_password',
+            'token', 'secret', 'api_key', 'access_token', 'refresh_token',
+            'ssn', 'social_security', 'credit_card', 'card_number',
+            'cvv', 'pin', 'secret_key', 'private_key'
+        ]
+        
+        sanitized = data.copy()
+        for field in sensitive_fields:
+            if field in sanitized:
+                sanitized[field] = '***REDACTED***'
+        
+        return sanitized
 
 
 class TimezoneMiddleware(MiddlewareMixin):

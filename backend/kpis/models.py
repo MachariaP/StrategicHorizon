@@ -45,9 +45,9 @@ class KPI(models.Model):
     @property
     def progress_percentage(self) -> float:
         """Calculate progress as percentage"""
-        if self.target_value > 0:
-            return min((float(self.current_value) / float(self.target_value)) * 100, 100.0)
-        return 0.0
+        if not self.target_value or self.target_value <= 0:
+            return 0.0
+        return min((float(self.current_value) / float(self.target_value)) * 100, 100.0)
     
     @property
     def actual_value(self) -> float:

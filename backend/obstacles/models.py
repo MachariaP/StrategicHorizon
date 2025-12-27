@@ -52,6 +52,8 @@ class Obstacle(models.Model):
     
     def save(self, *args, **kwargs):
         """Override save to update linked goal status if critical."""
+        from django.db import transaction
+        
         is_new = self.pk is None
         old_severity = None
         
@@ -65,20 +67,28 @@ class Obstacle(models.Model):
         super().save(*args, **kwargs)
         
         # If obstacle is critical and linked to a goal, update goal status
+        # Use atomic transaction to prevent race conditions
         if self.severity == 'critical' and self.goal:
-            if self.goal.status != 'stalled':
-                self.goal.status = 'stalled'
-                self.goal.save(update_fields=['status'])
+            with transaction.atomic():
+                # Lock the goal row for update to prevent concurrent modifications
+                goal = Goal.objects.select_for_update().get(pk=self.goal.pk)
+                if goal.status != 'stalled':
+                    goal.status = 'stalled'
+                    goal.save(update_fields=['status'])
         
         # If severity changed from critical to non-critical, check if we can unstall the goal
         elif old_severity == 'critical' and self.severity != 'critical' and self.goal:
-            # Check if there are any other critical obstacles for this goal
-            other_critical = Obstacle.objects.filter(
-                goal=self.goal,
-                severity='critical',
-                is_deleted=False
-            ).exclude(pk=self.pk).exists()
-            
-            if not other_critical and self.goal.status == 'stalled':
-                self.goal.status = 'in_progress'
-                self.goal.save(update_fields=['status'])
+            with transaction.atomic():
+                # Lock the goal row for update
+                goal = Goal.objects.select_for_update().get(pk=self.goal.pk)
+                
+                # Check if there are any other critical obstacles for this goal
+                other_critical = Obstacle.objects.filter(
+                    goal=goal,
+                    severity='critical',
+                    is_deleted=False
+                ).exclude(pk=self.pk).exists()
+                
+                if not other_critical and goal.status == 'stalled':
+                    goal.status = 'in_progress'
+                    goal.save(update_fields=['status'])
