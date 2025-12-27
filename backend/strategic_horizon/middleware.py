@@ -63,13 +63,18 @@ class AuditLogMiddleware(MiddlewareMixin):
         # Try to capture request body for POST/PATCH (but sanitize passwords)
         if request.method in ['POST', 'PATCH']:
             try:
-                if hasattr(request, 'body') and request.body:
-                    body = json.loads(request.body.decode('utf-8'))
+                # Use request.data if available (set by DRF) to avoid RawPostDataException
+                if hasattr(request, 'data') and request.data:
+                    # request.data is already parsed by DRF
+                    body = dict(request.data) if hasattr(request.data, 'items') else request.data
                     # Sanitize sensitive fields
                     body = self._sanitize_sensitive_data(body)
                     audit_data['request_body'] = body
-            except (json.JSONDecodeError, UnicodeDecodeError):
+            except (json.JSONDecodeError, UnicodeDecodeError, AttributeError):
                 audit_data['request_body'] = 'Unable to parse'
+            except Exception:
+                # Silently handle any other exceptions (e.g., RawPostDataException)
+                audit_data['request_body'] = 'Not available'
         
         # Log with special prefix for strategic shifts
         log_prefix = "STRATEGIC_SHIFT" if is_strategic_shift else "AUDIT"
