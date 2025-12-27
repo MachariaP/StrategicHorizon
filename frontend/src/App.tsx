@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Sidebar from './components/Sidebar';
+import { Toaster } from './components/ui/toaster';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -156,6 +157,7 @@ function App() {
   return (
     <Router>
       <AppContent />
+      <Toaster />
     </Router>
   );
 }
