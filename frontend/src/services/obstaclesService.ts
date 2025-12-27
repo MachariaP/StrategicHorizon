@@ -95,6 +95,7 @@ export function useCreateObstacle() {
           ...newObstacle,
           severity_index: newObstacle.severity_index || 5,
           is_blocking: newObstacle.is_blocking || false,
+          // Backend has mitigation_plan field with a @property mitigation that returns mitigation_plan
           mitigation: newObstacle.mitigation_plan || '',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
