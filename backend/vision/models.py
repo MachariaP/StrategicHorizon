@@ -70,3 +70,39 @@ class Vision(BaseModel):
             Number of non-deleted goals associated with this vision
         """
         return self.goals.filter(is_deleted=False).count()
+    
+    @property
+    def health_score(self) -> float:
+        """
+        Calculate vision health based on goal status distribution.
+        
+        Returns a score from 0.0 to 100.0 where:
+        - Completed goals: 100% contribution
+        - In Progress goals: 60% contribution
+        - Pending goals: 30% contribution
+        - Stalled goals: 0% contribution
+        
+        Returns:
+            Health score as a percentage (0-100)
+        """
+        goals = self.goals.filter(is_deleted=False)
+        total_goals = goals.count()
+        
+        if total_goals == 0:
+            return 0.0
+        
+        # Count goals by status
+        completed = goals.filter(status='completed').count()
+        in_progress = goals.filter(status='in_progress').count()
+        pending = goals.filter(status='pending').count()
+        stalled = goals.filter(status='stalled').count()
+        
+        # Calculate weighted health score
+        score = (
+            (completed * 100) +
+            (in_progress * 60) +
+            (pending * 30) +
+            (stalled * 0)
+        ) / total_goals
+        
+        return round(score, 2)

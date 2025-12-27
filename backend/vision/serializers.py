@@ -6,15 +6,17 @@ from typing import Dict, Any
 class VisionSerializer(serializers.ModelSerializer):
     time_horizon_display = serializers.CharField(source='get_time_horizon_display', read_only=True)
     goal_count = serializers.SerializerMethodField(read_only=True)
+    health_score = serializers.ReadOnlyField()
     
     class Meta:
         model = Vision
         fields = [
             'id', 'year', 'north_star', 'yearly_theme', 'time_horizon', 
             'time_horizon_display', 'five_whys', 'is_active', 'is_deleted', 
-            'deleted_at', 'visual_url', 'created_at', 'updated_at', 'goal_count'
+            'deleted_at', 'visual_url', 'created_at', 'updated_at', 'goal_count',
+            'health_score'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'deleted_at', 'is_deleted', 'goal_count']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'deleted_at', 'is_deleted', 'goal_count', 'health_score']
     
     def get_goal_count(self, obj: Vision) -> int:
         """
