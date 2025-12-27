@@ -34,6 +34,44 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Add response interceptor to handle 401/403 errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      const status = error.response.status;
+      
+      // Handle 401 Unauthorized - redirect to login
+      if (status === 401) {
+        // Clear authentication data
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        
+        // Redirect to login only if not already on login/register pages
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/login' && currentPath !== '/register') {
+          window.location.href = '/login';
+        }
+      }
+      
+      // Handle 403 Forbidden - also redirect to login (insufficient permissions)
+      if (status === 403) {
+        // Clear authentication data
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        
+        // Redirect to login
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/login' && currentPath !== '/register') {
+          window.location.href = '/login';
+        }
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
 // Auth API
 export const authAPI = {
   login: (credentials: LoginCredentials) =>
