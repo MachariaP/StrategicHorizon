@@ -20,6 +20,7 @@ export interface Vision {
   visual_url?: string;
   created_at: string;
   updated_at: string;
+  goal_count?: number;
 }
 
 export interface Goal {
