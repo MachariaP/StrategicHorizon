@@ -46,7 +46,7 @@ export interface KPI {
   goal_title?: string; // Added from backend enhancement
   goal_status?: string; // Added from backend enhancement
   name: string;
-  description: string;
+  description?: string;
   target_value: number;
   current_value?: number; // Added
   actual_value: number;
@@ -89,8 +89,8 @@ export interface Person {
   role: 'mentor' | 'partner' | 'supporter' | 'advisor' | 'other';
   role_display?: string; // Added from backend enhancement
   role_description: string;
-  contact_info: string;
-  notes: string;
+  contact_info?: string;
+  notes?: string;
   relationship_depth?: number; // Added
   relationship_depth_display?: string; // Added from backend enhancement
   last_contact_date?: string; // Added
@@ -125,7 +125,7 @@ export interface Obstacle {
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   severity_index?: number; // Added
-  mitigation: string;
+  mitigation?: string;
   mitigation_plan?: string; // Added
   is_blocking?: boolean; // Added
   created_at: string;
