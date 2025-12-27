@@ -263,7 +263,7 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
               </Label>
               <Select
                 value={selectedStatus}
-                onValueChange={(value) => setValue('status', value as any)}
+                onValueChange={(value) => setValue('status', value as any, { shouldValidate: true })}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -283,7 +283,7 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
               </Label>
               <Select
                 value={selectedStrategicLevel}
-                onValueChange={(value) => setValue('strategic_level', value as any)}
+                onValueChange={(value) => setValue('strategic_level', value as any, { shouldValidate: true })}
               >
                 <SelectTrigger>
                   <SelectValue />
