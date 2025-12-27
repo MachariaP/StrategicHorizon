@@ -39,6 +39,11 @@ class Goal(BaseModel):
         
         Returns:
             Average progress of all linked KPIs as a percentage (0-100)
+        
+        Note:
+            Current implementation iterates over KPIs in Python.
+            For high-traffic scenarios, consider using database aggregation
+            with annotations for better performance.
         """
         kpis = self.kpis.filter(is_deleted=False)
         if not kpis.exists():
