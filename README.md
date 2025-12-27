@@ -116,6 +116,10 @@ StrategicHorizon/
 
 ## 🚀 Getting Started
 
+> 📖 **New to the project?** Check out our [Quick Start Guide](./QUICK_START.md) for a streamlined setup experience!
+> 
+> ⚠️ **Experiencing issues?** See [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) for common problems and solutions.
+
 ### Prerequisites
 
 - Python 3.12+
