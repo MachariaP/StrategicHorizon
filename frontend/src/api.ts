@@ -14,6 +14,7 @@ import type {
   LoginCredentials,
   RegisterData,
   PaginatedResponse,
+  ConfidenceMatrixData,
 } from './types';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -25,7 +26,6 @@ const api = axios.create({
   },
 });
 
-// Add token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
   if (token) {
@@ -34,33 +34,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Add response interceptor to handle 401/403 errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
       const status = error.response.status;
       
-      // Handle 401 Unauthorized - redirect to login
       if (status === 401) {
-        // Clear authentication data
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         
-        // Redirect to login only if not already on login/register pages
         const currentPath = window.location.pathname;
         if (currentPath !== '/login' && currentPath !== '/register') {
           window.location.href = '/login';
         }
       }
       
-      // Handle 403 Forbidden - also redirect to login (insufficient permissions)
       if (status === 403) {
-        // Clear authentication data
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         
-        // Redirect to login
         const currentPath = window.location.pathname;
         if (currentPath !== '/login' && currentPath !== '/register') {
           window.location.href = '/login';
@@ -72,7 +65,6 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API
 export const authAPI = {
   login: (credentials: LoginCredentials) =>
     api.post<AuthTokens>('/api/auth/login/', credentials),
@@ -82,7 +74,6 @@ export const authAPI = {
     api.get<User>('/api/auth/user/'),
 };
 
-// Vision API
 export const visionAPI = {
   getAll: () => api.get<PaginatedResponse<Vision>>('/api/vision/'),
   getOne: (id: number) => api.get<Vision>(`/api/vision/${id}/`),
@@ -95,7 +86,6 @@ export const visionAPI = {
   getArchived: () => api.get<Vision[]>('/api/vision/archived/'),
 };
 
-// Goals API
 export const goalsAPI = {
   getAll: () => api.get<PaginatedResponse<Goal>>('/api/goals/'),
   getOne: (id: number) => api.get<Goal>(`/api/goals/${id}/`),
@@ -103,9 +93,13 @@ export const goalsAPI = {
   update: (id: number, data: Partial<Goal>) => api.put<Goal>(`/api/goals/${id}/`, data),
   patch: (id: number, data: Partial<Goal>) => api.patch<Goal>(`/api/goals/${id}/`, data),
   delete: (id: number) => api.delete(`/api/goals/${id}/`),
+  // New endpoints for strategic cascading and confidence matrix
+  getStrategicGoals: () => api.get<PaginatedResponse<Goal>>('/api/goals/strategic_goals/'),
+  getTacticalGoals: () => api.get<PaginatedResponse<Goal>>('/api/goals/tactical_goals/'),
+  getConfidenceMatrix: () => api.get<ConfidenceMatrixData>('/api/goals/confidence_matrix/'),
+  getSubGoals: (id: number) => api.get<Goal[]>(`/api/goals/${id}/sub_goals/'),
 };
 
-// KPIs API
 export const kpisAPI = {
   getAll: () => api.get<PaginatedResponse<KPI>>('/api/kpis/'),
   getOne: (id: number) => api.get<KPI>(`/api/kpis/${id}/`),
@@ -114,7 +108,6 @@ export const kpisAPI = {
   delete: (id: number) => api.delete(`/api/kpis/${id}/`),
 };
 
-// Non-Negotiables API
 export const nonNegotiablesAPI = {
   getAll: () => api.get<PaginatedResponse<NonNegotiable>>('/api/non-negotiables/'),
   getOne: (id: number) => api.get<NonNegotiable>(`/api/non-negotiables/${id}/`),
@@ -123,7 +116,6 @@ export const nonNegotiablesAPI = {
   delete: (id: number) => api.delete(`/api/non-negotiables/${id}/`),
 };
 
-// Systems API
 export const systemsAPI = {
   getAll: () => api.get<PaginatedResponse<System>>('/api/systems/'),
   getOne: (id: number) => api.get<System>(`/api/systems/${id}/`),
@@ -132,16 +124,14 @@ export const systemsAPI = {
   delete: (id: number) => api.delete(`/api/systems/${id}/`),
 };
 
-// People API
 export const peopleAPI = {
   getAll: () => api.get<PaginatedResponse<Person>>('/api/people/'),
   getOne: (id: number) => api.get<Person>(`/api/people/${id}/`),
   create: (data: Partial<Person>) => api.post<Person>('/api/people/', data),
-  update: (id: number, data: Partial<Person>) => api.put<Person>(`/api/people/${id}/`, data),
+  update: (id: number, data: Partial<Person>) => api.put<Person>('/api/people/${id}/', data),
   delete: (id: number) => api.delete(`/api/people/${id}/`),
 };
 
-// Executions API
 export const executionsAPI = {
   getAll: () => api.get<PaginatedResponse<Execution>>('/api/executions/'),
   getOne: (id: number) => api.get<Execution>(`/api/executions/${id}/`),
@@ -150,7 +140,6 @@ export const executionsAPI = {
   delete: (id: number) => api.delete(`/api/executions/${id}/`),
 };
 
-// Obstacles API
 export const obstaclesAPI = {
   getAll: () => api.get<PaginatedResponse<Obstacle>>('/api/obstacles/'),
   getOne: (id: number) => api.get<Obstacle>(`/api/obstacles/${id}/`),
@@ -159,7 +148,6 @@ export const obstaclesAPI = {
   delete: (id: number) => api.delete(`/api/obstacles/${id}/`),
 };
 
-// Reflections API
 export const reflectionsAPI = {
   getAll: () => api.get<PaginatedResponse<QuarterlyReflection>>('/api/reflections/'),
   getOne: (id: number) => api.get<QuarterlyReflection>(`/api/reflections/${id}/`),

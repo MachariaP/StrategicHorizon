@@ -1,31 +1,34 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { goalsAPI } from '../api';
-import type { Goal } from '../types';
+import type { Goal, ConfidenceMatrixData } from '../types';
 import axios from 'axios';
 
 export interface CreateGoalData {
   vision: number;
+  parent_goal?: number | null;
   title: string;
   description: string;
   status?: 'pending' | 'in_progress' | 'completed' | 'stalled';
+  strategic_level?: 'high' | 'low';
   confidence_level?: number;
   target_date?: string;
+  weight?: number;
 }
 
 export interface UpdateGoalData {
   vision?: number;
+  parent_goal?: number | null;
   title?: string;
   description?: string;
   status?: 'pending' | 'in_progress' | 'completed' | 'stalled';
+  strategic_level?: 'high' | 'low';
   confidence_level?: number;
   target_date?: string;
+  weight?: number;
 }
 
 const GOALS_QUERY_KEY = 'goals';
 
-/**
- * Custom hook for fetching goals using TanStack Query
- */
 export function useGoals() {
   return useQuery({
     queryKey: [GOALS_QUERY_KEY],
@@ -34,7 +37,6 @@ export function useGoals() {
       return response.data.results || [];
     },
     retry: (failureCount, error) => {
-      // Don't retry on 401 (Unauthorized)
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         return false;
       }
@@ -43,9 +45,6 @@ export function useGoals() {
   });
 }
 
-/**
- * Custom hook for fetching a single goal
- */
 export function useGoal(id: number | null) {
   return useQuery({
     queryKey: [GOALS_QUERY_KEY, id],
@@ -56,7 +55,6 @@ export function useGoal(id: number | null) {
     },
     enabled: !!id,
     retry: (failureCount, error) => {
-      // Don't retry on 401 or 404
       if (axios.isAxiosError(error)) {
         const status = error.response?.status;
         if (status === 401 || status === 404) {
@@ -68,9 +66,6 @@ export function useGoal(id: number | null) {
   });
 }
 
-/**
- * Custom hook for creating a goal with optimistic updates
- */
 export function useCreateGoal() {
   const queryClient = useQueryClient();
 
@@ -80,21 +75,22 @@ export function useCreateGoal() {
       return response.data;
     },
     onMutate: async (newGoal) => {
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: [GOALS_QUERY_KEY] });
 
-      // Snapshot previous value
       const previousGoals = queryClient.getQueryData<Goal[]>([GOALS_QUERY_KEY]);
 
-      // Optimistically update with temporary ID
       if (previousGoals) {
         const optimisticGoal: Goal = {
-          id: Math.random() * 1000000, // Temporary ID (will be replaced by server response)
+          id: Math.random() * 1000000,
           ...newGoal,
+          strategic_level: newGoal.strategic_level || 'low',
           status: newGoal.status || 'pending',
           confidence_level: newGoal.confidence_level || 3,
+          weight: newGoal.weight || 1.0,
           progress_percentage: 0,
           kpi_count: 0,
+          sub_goal_count: 0,
+          vision_name: '',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
@@ -108,21 +104,16 @@ export function useCreateGoal() {
       return { previousGoals };
     },
     onError: (err, newGoal, context) => {
-      // Rollback on error
       if (context?.previousGoals) {
         queryClient.setQueryData([GOALS_QUERY_KEY], context.previousGoals);
       }
     },
     onSuccess: () => {
-      // Refetch to get accurate data from server
       queryClient.invalidateQueries({ queryKey: [GOALS_QUERY_KEY] });
     },
   });
 }
 
-/**
- * Custom hook for updating a goal with optimistic updates
- */
 export function useUpdateGoal() {
   const queryClient = useQueryClient();
 
@@ -132,15 +123,12 @@ export function useUpdateGoal() {
       return response.data;
     },
     onMutate: async ({ id, data }) => {
-      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: [GOALS_QUERY_KEY] });
       await queryClient.cancelQueries({ queryKey: [GOALS_QUERY_KEY, id] });
 
-      // Snapshot previous values
       const previousGoals = queryClient.getQueryData<Goal[]>([GOALS_QUERY_KEY]);
       const previousGoal = queryClient.getQueryData<Goal>([GOALS_QUERY_KEY, id]);
 
-      // Optimistically update goals list
       if (previousGoals) {
         queryClient.setQueryData<Goal[]>(
           [GOALS_QUERY_KEY],
@@ -152,7 +140,6 @@ export function useUpdateGoal() {
         );
       }
 
-      // Optimistically update single goal
       if (previousGoal) {
         queryClient.setQueryData<Goal>(
           [GOALS_QUERY_KEY, id],
@@ -163,7 +150,6 @@ export function useUpdateGoal() {
       return { previousGoals, previousGoal };
     },
     onError: (err, { id }, context) => {
-      // Rollback on error
       if (context?.previousGoals) {
         queryClient.setQueryData([GOALS_QUERY_KEY], context.previousGoals);
       }
@@ -172,16 +158,12 @@ export function useUpdateGoal() {
       }
     },
     onSuccess: (data, { id }) => {
-      // Update cache with server response
       queryClient.setQueryData([GOALS_QUERY_KEY, id], data);
       queryClient.invalidateQueries({ queryKey: [GOALS_QUERY_KEY] });
     },
   });
 }
 
-/**
- * Custom hook for deleting a goal
- */
 export function useDeleteGoal() {
   const queryClient = useQueryClient();
 
@@ -192,6 +174,72 @@ export function useDeleteGoal() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [GOALS_QUERY_KEY] });
+    },
+  });
+}
+
+export function useConfidenceMatrix() {
+  return useQuery({
+    queryKey: ['confidence-matrix'],
+    queryFn: async () => {
+      const response = await goalsAPI.getConfidenceMatrix();
+      return response.data;
+    },
+    retry: (failureCount, error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+  });
+}
+
+export function useStrategicGoals() {
+  return useQuery({
+    queryKey: ['strategic-goals'],
+    queryFn: async () => {
+      const response = await goalsAPI.getStrategicGoals();
+      return response.data.results || [];
+    },
+    retry: (failureCount, error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+  });
+}
+
+export function useTacticalGoals() {
+  return useQuery({
+    queryKey: ['tactical-goals'],
+    queryFn: async () => {
+      const response = await goalsAPI.getTacticalGoals();
+      return response.data.results || [];
+    },
+    retry: (failureCount, error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 2;
+    },
+  });
+}
+
+export function useSubGoals(parentGoalId: number | null) {
+  return useQuery({
+    queryKey: ['sub-goals', parentGoalId],
+    queryFn: async () => {
+      if (!parentGoalId) return [];
+      const response = await goalsAPI.getSubGoals(parentGoalId);
+      return response.data;
+    },
+    enabled: !!parentGoalId,
+    retry: (failureCount, error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 2;
     },
   });
 }
