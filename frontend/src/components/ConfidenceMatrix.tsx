@@ -70,13 +70,13 @@ const ConfidenceMatrix: React.FC = () => {
       </div>
 
       {goals.length > 0 && (
-        <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
+        <div className="space-y-2 max-h-40 overflow-y-auto scrollbar-thin">
           {goals.slice(0, 5).map(goal => (
             <div 
               key={goal.id} 
               className="bg-black/20 rounded-lg p-3 backdrop-blur-sm border border-white/10"
             >
-              <div className="text-sm font-semibold text-white mb-1 line-clamp-1">
+              <div className="text-sm font-semibold text-white mb-1 truncate">
                 {goal.title}
               </div>
               <div className="flex items-center justify-between text-xs text-gray-300/80">
