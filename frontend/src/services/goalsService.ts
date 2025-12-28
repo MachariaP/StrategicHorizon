@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { goalsAPI } from '../api';
-import type { Goal, ConfidenceMatrixData } from '../types';
+import type { Goal } from '../types';
 import axios from 'axios';
 
 export interface CreateGoalData {
