@@ -1,6 +1,35 @@
 from django.db import models
 from django.contrib.auth.models import User
 from goals.models import Goal
+from django.utils import timezone
+
+
+class KPIHistory(models.Model):
+    """
+    Separate model for storing KPI historical snapshots.
+    This allows for efficient database-level analytics and prevents JSONField bloat.
+    """
+    kpi = models.ForeignKey('KPI', on_delete=models.CASCADE, related_name='history')
+    value = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="KPI value at this point in time"
+    )
+    recorded_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Timestamp when this snapshot was recorded"
+    )
+    
+    class Meta:
+        ordering = ['-recorded_at']
+        verbose_name = 'KPI History'
+        verbose_name_plural = 'KPI Histories'
+        indexes = [
+            models.Index(fields=['kpi', '-recorded_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.kpi.name} - {self.value} at {self.recorded_at.date()}"
 
 
 class KPI(models.Model):
@@ -53,3 +82,24 @@ class KPI(models.Model):
     def actual_value(self) -> float:
         """Alias for current_value for backward compatibility"""
         return float(self.current_value)
+    
+    def get_history_trend_data(self, days: int = 365) -> list:
+        """
+        Get trend data from KPIHistory model instead of JSONField.
+        Returns list of dicts with date and value for the last N days.
+        """
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        cutoff_date = timezone.now() - timedelta(days=days)
+        history_records = self.history.filter(
+            recorded_at__gte=cutoff_date
+        ).order_by('recorded_at')
+        
+        return [
+            {
+                'date': record.recorded_at.date().isoformat(),
+                'value': float(record.value)
+            }
+            for record in history_records
+        ]
