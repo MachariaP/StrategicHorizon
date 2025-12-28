@@ -70,11 +70,6 @@ export function getProgressBarColor(percentage: number): string {
  * @returns Tailwind CSS gradient classes
  */
 export function getProgressBadgeColor(percentage: number): string {
-  if (percentage >= 71) {
-    return 'from-green-500 to-emerald-600';
-  }
-  if (percentage >= 31) {
-    return 'from-orange-500 to-blue-500';
-  }
-  return 'from-red-500 to-orange-500';
+  // Use the same logic as progress bar color
+  return getProgressBarColor(percentage);
 }

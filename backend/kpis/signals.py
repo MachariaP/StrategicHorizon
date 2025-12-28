@@ -1,12 +1,28 @@
 """
 Signals for KPI module to handle automatic updates.
 """
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from .models import KPI, KPIHistory
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Store previous values in thread-local storage to avoid extra DB queries
+_kpi_previous_values = {}
+
+
+@receiver(pre_save, sender=KPI)
+def store_previous_kpi_value(sender, instance, **kwargs):
+    """
+    Store the previous current_value before save to check if it changed.
+    This avoids an extra database query in the post_save signal.
+    """
+    if instance.pk:
+        # Only store if this is an update (has primary key)
+        _kpi_previous_values[instance.pk] = {
+            'current_value': KPI.objects.filter(pk=instance.pk).values_list('current_value', flat=True).first()
+        }
 
 
 @receiver(post_save, sender=KPI)
@@ -32,24 +48,25 @@ def create_kpi_history_snapshot(sender, instance, created, **kwargs):
     Automatically create a KPIHistory entry when a KPI's current_value changes.
     This provides real-time historical tracking without relying on Celery tasks.
     """
-    # Only create history for significant changes, not on every save
-    # Check if current_value actually changed
-    if not created:
-        # Get the previous value from the database
-        try:
-            old_kpi = KPI.objects.get(pk=instance.pk)
-            if old_kpi.current_value != instance.current_value:
-                KPIHistory.objects.create(
-                    kpi=instance,
-                    value=instance.current_value
-                )
-                logger.info(f"Created history snapshot for KPI '{instance.name}': {instance.current_value}")
-        except KPI.DoesNotExist:
-            pass
-    else:
-        # For new KPIs, create initial history entry
+    should_create_history = False
+    
+    if created:
+        # For new KPIs, always create initial history entry
+        should_create_history = True
+        logger.info(f"Created initial history snapshot for new KPI '{instance.name}'")
+    elif instance.pk in _kpi_previous_values:
+        # For updates, check if current_value actually changed
+        previous_value = _kpi_previous_values.get(instance.pk, {}).get('current_value')
+        if previous_value is not None and previous_value != instance.current_value:
+            should_create_history = True
+            logger.info(f"Created history snapshot for KPI '{instance.name}': {instance.current_value}")
+        
+        # Clean up the stored value
+        del _kpi_previous_values[instance.pk]
+    
+    if should_create_history:
         KPIHistory.objects.create(
             kpi=instance,
             value=instance.current_value
         )
-        logger.info(f"Created initial history snapshot for new KPI '{instance.name}'")
+

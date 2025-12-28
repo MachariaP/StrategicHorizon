@@ -3,6 +3,14 @@ import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Responsive
 import { goalsAPI } from '../api';
 import type { ConfidenceMatrixData, Goal } from '../types';
 
+interface ScatterDataPoint {
+  x: number;
+  y: number;
+  title: string;
+  id: number | string;
+  status: string;
+}
+
 const StrategicDashboard: React.FC = () => {
   const [matrixData, setMatrixData] = useState<ConfidenceMatrixData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,7 +48,7 @@ const StrategicDashboard: React.FC = () => {
     ...matrixData.quadrant4,
   ] : [];
 
-  const scatterData = allGoals.map((goal: Goal) => ({
+  const scatterData: ScatterDataPoint[] = allGoals.map((goal: Goal) => ({
     x: goal.progress_percentage,
     y: goal.confidence_level,
     title: goal.title,
@@ -57,7 +65,15 @@ const StrategicDashboard: React.FC = () => {
     return '#6b7280'; // Gray - Middle zone
   };
 
-  const CustomTooltip = ({ active, payload }: any) => {
+  // Custom tooltip component with explicit type definition
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: ScatterDataPoint;
+    }>;
+  }
+
+  const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
