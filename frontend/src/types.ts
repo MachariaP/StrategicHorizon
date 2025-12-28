@@ -75,6 +75,7 @@ export interface KPI {
   unit: string;
   progress_percentage: number;
   trend_data?: Array<{ date: string; value: number }>;
+  history_trend_data?: Array<{ date: string; value: number }>;
   created_at: string;
   updated_at: string;
 }
