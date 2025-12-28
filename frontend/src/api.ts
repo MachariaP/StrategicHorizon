@@ -97,7 +97,7 @@ export const goalsAPI = {
   getStrategicGoals: () => api.get<PaginatedResponse<Goal>>('/api/goals/strategic_goals/'),
   getTacticalGoals: () => api.get<PaginatedResponse<Goal>>('/api/goals/tactical_goals/'),
   getConfidenceMatrix: () => api.get<ConfidenceMatrixData>('/api/goals/confidence_matrix/'),
-  getSubGoals: (id: number) => api.get<Goal[]>(`/api/goals/${id}/sub_goals/'),
+  getSubGoals: (id: number) => api.get<Goal[]>(`/api/goals/${id}/sub_goals/`),
 };
 
 export const kpisAPI = {
@@ -128,7 +128,7 @@ export const peopleAPI = {
   getAll: () => api.get<PaginatedResponse<Person>>('/api/people/'),
   getOne: (id: number) => api.get<Person>(`/api/people/${id}/`),
   create: (data: Partial<Person>) => api.post<Person>('/api/people/', data),
-  update: (id: number, data: Partial<Person>) => api.put<Person>('/api/people/${id}/', data),
+  update: (id: number, data: Partial<Person>) => api.put<Person>(`/api/people/${id}/`, data),
   delete: (id: number) => api.delete(`/api/people/${id}/`),
 };
 
