@@ -21,38 +21,60 @@ export interface Vision {
   created_at: string;
   updated_at: string;
   goal_count?: number;
-  health_score?: number; // Added from backend enhancement
+  health_score?: number;
 }
 
 export interface Goal {
   id: number;
-  vision?: number;
-  vision_details?: Vision;
+  vision: number;
+  vision_name?: string;
+  vision_year?: number;
+  parent_goal?: number | null;
+  parent_goal_title?: string;
   title: string;
   description: string;
   status: 'pending' | 'in_progress' | 'completed' | 'stalled';
-  confidence_level: number; // 1-5
+  strategic_level: 'high' | 'low';
+  confidence_level: number;
   target_date?: string;
+  weight: number;
   progress_percentage: number;
   kpi_count: number;
-  strategic_level?: 'high' | 'low'; // Client-side only for UI distinction
+  sub_goal_count: number;
+  is_deleted?: boolean;
+  deleted_at?: string;
   created_at: string;
   updated_at: string;
+  vision_details?: Vision;
+}
+
+export interface ConfidenceMatrixData {
+  quadrant1: Goal[];
+  quadrant2: Goal[];
+  quadrant3: Goal[];
+  quadrant4: Goal[];
+  stats: {
+    total: number;
+    high_risk: number;
+    false_security: number;
+    on_track: number;
+    early_stage: number;
+  };
 }
 
 export interface KPI {
   id: number;
   goal: number;
-  goal_title?: string; // Added from backend enhancement
-  goal_status?: string; // Added from backend enhancement
+  goal_title?: string;
+  goal_status?: string;
   name: string;
   description?: string;
   target_value: number;
-  current_value?: number; // Added
+  current_value?: number;
   actual_value: number;
   unit: string;
   progress_percentage: number;
-  trend_data?: Array<{ date: string; value: number }>; // Added
+  trend_data?: Array<{ date: string; value: number }>;
   created_at: string;
   updated_at: string;
 }
@@ -62,8 +84,8 @@ export interface NonNegotiable {
   title: string;
   description: string;
   frequency: 'daily' | 'weekly' | 'monthly';
-  frequency_display?: string; // Added from backend enhancement
-  is_binary?: boolean; // Added
+  frequency_display?: string;
+  is_binary?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -73,12 +95,12 @@ export interface System {
   name: string;
   description: string;
   frequency: string;
-  frequency_display?: string; // Added from backend enhancement
-  input_definition?: string; // Added
-  output_kpi_link?: string; // Added
-  last_execution_date?: string; // Added
-  health_status?: string; // Added
-  health_status_display?: string; // Added from backend enhancement
+  frequency_display?: string;
+  input_definition?: string;
+  output_kpi_link?: string;
+  last_execution_date?: string;
+  health_status?: string;
+  health_status_display?: string;
   created_at: string;
   updated_at: string;
 }
@@ -87,16 +109,16 @@ export interface Person {
   id: number;
   name: string;
   role: 'mentor' | 'partner' | 'supporter' | 'advisor' | 'other';
-  role_display?: string; // Added from backend enhancement
+  role_display?: string;
   role_description: string;
   contact_info?: string;
   notes?: string;
-  relationship_depth?: number; // Added
-  relationship_depth_display?: string; // Added from backend enhancement
-  last_contact_date?: string; // Added
-  frequency_days?: number; // Added
-  needs_contact?: boolean; // Added
-  days_until_contact?: number; // Added
+  relationship_depth?: number;
+  relationship_depth_display?: string;
+  last_contact_date?: string;
+  frequency_days?: number;
+  needs_contact?: boolean;
+  days_until_contact?: number;
   created_at: string;
   updated_at: string;
 }
@@ -104,12 +126,12 @@ export interface Person {
 export interface Execution {
   id: number;
   goal?: number;
-  goal_title?: string; // Added from backend enhancement
-  goal_status?: string; // Added from backend enhancement
+  goal_title?: string;
+  goal_status?: string;
   title: string;
   description: string;
   month: number;
-  month_display?: string; // Added from backend enhancement
+  month_display?: string;
   year: number;
   status: 'planned' | 'in_progress' | 'completed' | 'deferred';
   created_at: string;
@@ -119,35 +141,35 @@ export interface Execution {
 export interface Obstacle {
   id: number;
   goal?: number;
-  goal_title?: string; // Added from backend enhancement
-  goal_status?: string; // Added from backend enhancement
+  goal_title?: string;
+  goal_status?: string;
   title: string;
   description: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  severity_index?: number; // Added
+  severity_index?: number;
   mitigation?: string;
-  mitigation_plan?: string; // Added
-  is_blocking?: boolean; // Added
+  mitigation_plan?: string;
+  is_blocking?: boolean;
   created_at: string;
   updated_at: string;
 }
 
 export interface QuarterlyReflection {
   id: number;
-  reflection_type?: 'weekly' | 'monthly' | 'quarterly'; // Added
+  reflection_type?: 'weekly' | 'monthly' | 'quarterly';
   quarter?: 1 | 2 | 3 | 4;
-  week_number?: number; // Added
-  month?: number; // Added
+  week_number?: number;
+  month?: number;
   year: number;
   wins: string;
   challenges: string;
   lessons_learned: string;
   adjustments: string;
-  gratitude_log?: string; // Added
-  is_locked?: boolean; // Added
-  locked_at?: string; // Added
-  can_edit?: boolean; // Added
-  time_until_lock?: number; // Added
+  gratitude_log?: string;
+  is_locked?: boolean;
+  locked_at?: string;
+  can_edit?: boolean;
+  time_until_lock?: number;
   created_at: string;
   updated_at: string;
 }
