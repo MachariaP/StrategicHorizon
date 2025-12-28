@@ -1,8 +1,9 @@
-// src/pages/Dashboard.tsx - Enhanced version
+// src/pages/Dashboard.tsx - Enhanced version with Confidence Matrix
 import React, { useEffect, useState } from 'react';
 import { visionAPI, goalsAPI, kpisAPI, executionsAPI } from '../api';
 import type { Vision, Goal, KPI, Execution } from '../types';
 import GlassCard from '../components/GlassCard';
+import ConfidenceMatrix from '../components/ConfidenceMatrix';
 
 const Dashboard: React.FC = () => {
   const [vision, setVision] = useState<Vision | null>(null);
@@ -37,6 +38,13 @@ const Dashboard: React.FC = () => {
 
   const completedGoals = goals.filter((g) => g.status === 'completed').length;
   const inProgressGoals = goals.filter((g) => g.status === 'in_progress').length;
+  const highRiskGoals = goals.filter(g => 
+    g.progress_percentage <= 30 && g.confidence_level <= 2
+  ).length;
+  const onTrackGoals = goals.filter(g => 
+    g.progress_percentage >= 70 && g.confidence_level >= 4
+  ).length;
+  
   const avgKPIProgress = kpis.length > 0
     ? kpis.reduce((sum, kpi) => sum + kpi.progress_percentage, 0) / kpis.length
     : 0;
@@ -52,16 +60,16 @@ const Dashboard: React.FC = () => {
       trend: 'up'
     },
     {
-      title: 'In Progress',
-      value: inProgressGoals,
-      icon: '⚡',
-      color: 'from-blue-500 to-cyan-500',
-      change: '+5%',
-      trend: 'up'
+      title: 'High Risk',
+      value: highRiskGoals,
+      icon: '⚠️',
+      color: 'from-red-500 to-orange-500',
+      change: highRiskGoals > 0 ? `${highRiskGoals} need attention` : 'All clear',
+      trend: highRiskGoals > 0 ? 'down' : 'up'
     },
     {
-      title: 'Completed',
-      value: completedGoals,
+      title: 'On Track',
+      value: onTrackGoals,
       icon: '✅',
       color: 'from-green-500 to-emerald-500',
       change: '+23%',
@@ -71,7 +79,7 @@ const Dashboard: React.FC = () => {
       title: 'Avg Progress',
       value: `${avgKPIProgress.toFixed(1)}%`,
       icon: '📈',
-      color: 'from-yellow-500 to-orange-500',
+      color: 'from-blue-500 to-cyan-500',
       change: '+8%',
       trend: 'up'
     }
@@ -194,6 +202,21 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
 
+          {/* Confidence Matrix Section */}
+          <div className="mb-12">
+            <div className="flex items-center mb-6">
+              <div className="relative mr-4">
+                <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-blue-500 rounded-full blur opacity-50" />
+                <div className="relative text-4xl">📊</div>
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">Confidence vs Progress Matrix</h2>
+                <p className="text-purple-300/70">Analyze goal health across four risk quadrants</p>
+              </div>
+            </div>
+            <ConfidenceMatrix />
+          </div>
+
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Goals Column */}
@@ -237,14 +260,24 @@ const Dashboard: React.FC = () => {
                             }`}>
                               {goal.status.replace('_', ' ').toUpperCase()}
                             </span>
+                            {goal.strategic_level === 'high' && (
+                              <span className="ml-2 px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-xs">
+                                Strategic
+                              </span>
+                            )}
                           </div>
                           <p className="text-gray-400 text-sm mb-4 line-clamp-2">{goal.description}</p>
-                          {goal.target_date && (
-                            <div className="flex items-center text-sm text-purple-400">
-                              <span className="mr-2">📅</span>
-                              <span>Target: {new Date(goal.target_date).toLocaleDateString()}</span>
-                            </div>
-                          )}
+                          <div className="flex items-center justify-between">
+                            {goal.target_date && (
+                              <div className="flex items-center text-sm text-purple-400">
+                                <span className="mr-2">📅</span>
+                                <span>Target: {new Date(goal.target_date).toLocaleDateString()}</span>
+                              </div>
+                            )}
+                            <span className="text-sm text-blue-400">
+                              Confidence: {goal.confidence_level}/5
+                            </span>
+                          </div>
                         </div>
                         <div className="ml-4 text-4xl opacity-50 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">
                           🎯

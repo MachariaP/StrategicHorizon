@@ -30,12 +30,14 @@ import type { Goal } from '../types';
 
 const goalSchema = z.object({
   vision: z.number({ required_error: 'Please select a vision' }),
+  parent_goal: z.number().nullable().optional(),
   title: z.string().min(3, 'Title must be at least 3 characters').max(255),
   description: z.string().optional(),
   status: z.enum(['pending', 'in_progress', 'completed', 'stalled']),
+  strategic_level: z.enum(['high', 'low']),
   confidence_level: z.number().min(1).max(5),
   target_date: z.string().optional(),
-  strategic_level: z.enum(['high', 'low']).optional(),
+  weight: z.number().min(0).max(10).default(1.0),
 });
 
 type GoalFormData = z.infer<typeof goalSchema>;
@@ -60,6 +62,7 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
 
   const [confidenceLevel, setConfidenceLevel] = React.useState<number[]>([3]);
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>();
+  const [weight, setWeight] = React.useState<number[]>([1.0]);
 
   const {
     register,
@@ -72,8 +75,9 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
     resolver: zodResolver(goalSchema),
     defaultValues: {
       status: 'pending',
-      confidence_level: 3,
       strategic_level: 'low',
+      confidence_level: 3,
+      weight: 1.0,
     },
   });
 
@@ -86,24 +90,29 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
     if (goal && mode === 'edit') {
       reset({
         vision: goal.vision,
+        parent_goal: goal.parent_goal || null,
         title: goal.title,
         description: goal.description,
         status: goal.status,
+        strategic_level: goal.strategic_level,
         confidence_level: goal.confidence_level,
-        strategic_level: goal.strategic_level || 'low',
+        weight: goal.weight || 1.0,
         target_date: goal.target_date,
       });
       setConfidenceLevel([goal.confidence_level]);
+      setWeight([goal.weight || 1.0]);
       if (goal.target_date) {
         setSelectedDate(new Date(goal.target_date));
       }
     } else if (mode === 'create') {
       reset({
         status: 'pending',
-        confidence_level: 3,
         strategic_level: 'low',
+        confidence_level: 3,
+        weight: 1.0,
       });
       setConfidenceLevel([3]);
+      setWeight([1.0]);
       setSelectedDate(undefined);
     }
   }, [goal, mode, reset]);
@@ -112,6 +121,11 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
   useEffect(() => {
     setValue('confidence_level', confidenceLevel[0]);
   }, [confidenceLevel, setValue]);
+
+  // Update weight in form when slider changes
+  useEffect(() => {
+    setValue('weight', weight[0]);
+  }, [weight, setValue]);
 
   // Update target date in form when date picker changes
   useEffect(() => {
@@ -127,11 +141,14 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
       if (mode === 'create') {
         await createGoal.mutateAsync({
           vision: data.vision,
+          parent_goal: data.parent_goal || null,
           title: data.title,
           description: data.description || '',
           status: data.status,
+          strategic_level: data.strategic_level,
           confidence_level: data.confidence_level,
           target_date: data.target_date,
+          weight: data.weight,
         });
         toast({
           title: 'Goal Created',
@@ -143,11 +160,14 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
           id: goal!.id,
           data: {
             vision: data.vision,
+            parent_goal: data.parent_goal || null,
             title: data.title,
             description: data.description || '',
             status: data.status,
+            strategic_level: data.strategic_level,
             confidence_level: data.confidence_level,
             target_date: data.target_date,
+            weight: data.weight,
           },
         });
         toast({
@@ -321,6 +341,32 @@ export const GoalFormDialog: React.FC<GoalFormDialogProps> = ({
             </div>
             <p className="text-xs text-slate-600 italic">
               How confident are you that you'll achieve this goal?
+            </p>
+          </div>
+
+          {/* Weight (for strategic cascading) */}
+          <div className="space-y-2">
+            <Label htmlFor="weight" className="text-sm font-semibold">
+              Weight: <span className="text-blue-600 font-bold">{weight[0].toFixed(1)}</span>
+            </Label>
+            <div className="pt-2">
+              <Slider
+                id="weight"
+                min={0}
+                max={10}
+                step={0.5}
+                value={weight}
+                onValueChange={setWeight}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs text-slate-500 mt-2">
+                <span>0.0 - Low Priority</span>
+                <span>5.0 - Medium</span>
+                <span>10.0 - High Priority</span>
+              </div>
+            </div>
+            <p className="text-xs text-slate-600 italic">
+              Weight affects progress calculation for parent goals (Strategic Cascading)
             </p>
           </div>
 
