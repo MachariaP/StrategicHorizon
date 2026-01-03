@@ -10,6 +10,7 @@ const Sidebar: React.FC = () => {
     { name: 'Vision & Theme', path: '/app/vision', icon: '🎯', color: 'from-purple-500 to-pink-500' },
     { name: 'Goals', path: '/app/goals', icon: '🎪', color: 'from-green-500 to-emerald-500' },
     { name: 'KPIs', path: '/app/kpis', icon: '📈', color: 'from-yellow-500 to-orange-500' },
+    { name: 'Strategic Dashboard', path: '/app/strategic-dashboard', icon: '🎯', color: 'from-cyan-500 to-blue-500' },
     { name: 'Non-Negotiables', path: '/app/non-negotiables', icon: '🛡️', color: 'from-red-500 to-rose-500' },
     { name: 'Systems', path: '/app/systems', icon: '⚙️', color: 'from-indigo-500 to-blue-500' },
     { name: 'People', path: '/app/people', icon: '👥', color: 'from-teal-500 to-cyan-500' },

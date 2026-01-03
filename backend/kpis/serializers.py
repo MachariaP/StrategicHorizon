@@ -1,6 +1,15 @@
 from rest_framework import serializers
-from .models import KPI
+from .models import KPI, KPIHistory
 from typing import Dict, Any
+
+
+class KPIHistorySerializer(serializers.ModelSerializer):
+    """Serializer for KPIHistory model."""
+    
+    class Meta:
+        model = KPIHistory
+        fields = ['id', 'kpi', 'value', 'recorded_at']
+        read_only_fields = ['id', 'recorded_at']
 
 
 class KPISerializer(serializers.ModelSerializer):
@@ -9,20 +18,25 @@ class KPISerializer(serializers.ModelSerializer):
     actual_value = serializers.ReadOnlyField()  # Computed from current_value
     goal_title = serializers.CharField(source='goal.title', read_only=True)
     goal_status = serializers.CharField(source='goal.status', read_only=True)
+    history_trend_data = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = KPI
         fields = [
             'id', 'goal', 'goal_title', 'goal_status', 'name', 'description', 
             'current_value', 'target_value', 'actual_value', 
-            'unit', 'trend_data', 'progress_percentage', 
+            'unit', 'trend_data', 'history_trend_data', 'progress_percentage', 
             'is_deleted', 'deleted_at',
             'created_at', 'updated_at'
         ]
         read_only_fields = [
             'id', 'progress_percentage', 'actual_value', 'goal_title', 
-            'goal_status', 'created_at', 'updated_at', 'is_deleted', 'deleted_at'
+            'goal_status', 'history_trend_data', 'created_at', 'updated_at', 'is_deleted', 'deleted_at'
         ]
+    
+    def get_history_trend_data(self, obj: KPI) -> list:
+        """Get trend data from KPIHistory model."""
+        return obj.get_history_trend_data()
 
     def validate(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """

@@ -36,17 +36,55 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+    
     if (error.response) {
       const status = error.response.status;
       
-      if (status === 401) {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+      if (status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
         
-        const currentPath = window.location.pathname;
-        if (currentPath !== '/login' && currentPath !== '/register') {
-          window.location.href = '/login';
+        // Try to refresh the token
+        const refreshToken = localStorage.getItem('refresh_token');
+        
+        if (refreshToken) {
+          try {
+            // Attempt silent token refresh
+            const response = await axios.post(`${API_URL}/api/auth/token/refresh/`, {
+              refresh: refreshToken
+            });
+            
+            const { access } = response.data;
+            
+            // Store new access token
+            localStorage.setItem('access_token', access);
+            
+            // Update the authorization header
+            originalRequest.headers.Authorization = `Bearer ${access}`;
+            
+            // Retry the original request
+            return api(originalRequest);
+          } catch (refreshError) {
+            // Refresh failed, clear tokens and redirect to login
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            
+            const currentPath = window.location.pathname;
+            if (currentPath !== '/login' && currentPath !== '/register') {
+              window.location.href = '/login';
+            }
+            
+            return Promise.reject(refreshError);
+          }
+        } else {
+          // No refresh token available, redirect to login
+          localStorage.removeItem('access_token');
+          
+          const currentPath = window.location.pathname;
+          if (currentPath !== '/login' && currentPath !== '/register') {
+            window.location.href = '/login';
+          }
         }
       }
       
